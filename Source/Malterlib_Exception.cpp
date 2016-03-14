@@ -55,6 +55,7 @@ namespace NMib
 			m_pErrorAllocNonTracked.f_Clear();
 			m_pCallstack.f_Clear();
 			m_pCallstackNonTracked.f_Clear();
+			m_TypeHash = _Other.m_TypeHash;
 			fp_Copy(_Other);
 			return *this;
 		}
@@ -86,6 +87,7 @@ namespace NMib
 			, m_pFile(_Other.m_pFile)
 			, m_pFunction(_Other.m_pFunction)
 			, m_Line(_Other.m_Line)
+			, m_TypeHash(_Other.m_TypeHash)
 		{
 			fp_Copy(_Other);
 		}
@@ -129,13 +131,14 @@ namespace NMib
 #endif
 		}
 
-		CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace)
+		CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
 			: m_Magic(mcp_Magic)
 			, m_pClass(_pClass ? _pClass : "CExceptionBase")
 			, m_pFile(_pFile ? _pFile : "Unknown")
 			, m_pFunction(_pFunction ? _pFunction : "Unknown")
 			, m_Line(_Line)
 			, m_pErrorAlloc(fg_Construct(_Error))
+			, m_TypeHash(_TypeHash)
 		{
 			m_ErrorNoAlloc[0] = 0;
 			if (_bStackTrace)
@@ -148,13 +151,14 @@ namespace NMib
 #endif
 		}
 
-		CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStrNonTracked const &_Error, bool _bTrace, bool _bStackTrace)
+		CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStrNonTracked const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
 			: m_Magic(mcp_Magic)
 			, m_pClass(_pClass ? _pClass : "CExceptionBase")
 			, m_pFile(_pFile ? _pFile : "Unknown")
 			, m_pFunction(_pFunction ? _pFunction : "Unknown")
 			, m_Line(_Line)
 			, m_pErrorAllocNonTracked(fg_Construct(_Error))
+			, m_TypeHash(_TypeHash)
 		{
 			m_ErrorNoAlloc[0] = 0;
 			if (_bStackTrace)
@@ -193,12 +197,13 @@ namespace NMib
 		}
 #endif
 
-		CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, const ch8 *_pError, bool _bTrace, bool _bStackTrace)
+		CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, const ch8 *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
 			: m_Magic(mcp_Magic)
 			, m_pClass(_pClass ? _pClass : "CExceptionBase")
 			, m_pFile(_pFile ? _pFile : "Unknown")
 			, m_pFunction(_pFunction ? _pFunction : "Unknown")
 			, m_Line(_Line)
+			, m_TypeHash(_TypeHash)
 		{
 
 			if (_bStackTrace)
