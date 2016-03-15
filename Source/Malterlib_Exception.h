@@ -97,7 +97,7 @@ namespace NMib
 		};
 
 #		ifdef DMibRuntimeTypeRegistry
-#			define DMibException_TypeHash(d_Type) ::NMib::fg_GetExceptionHash<d_Type>()
+#			define DMibException_TypeHash(d_Type) ::NMib::fg_GetTypeHash<d_Type>()
 #			define DMibImpErrorClass_TypeRegistry(d_CClass) DMibConcurrencyRegisterException(d_CClass)
 #		else
 #			define DMibException_TypeHash(d_Type) 0
