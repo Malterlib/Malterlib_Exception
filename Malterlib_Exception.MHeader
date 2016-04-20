@@ -51,6 +51,7 @@ Property
 	
 	MalterlibTests "Malterlib_Exception;@(MalterlibTests)"
 	MalterlibTestFiles_Malterlib_Exception "@('Test/*'->MakeAbsolute())"
+	MalterlibTestDependencies_Malterlib_Exception "Lib_Malterlib_Concurrency"
 }
 
 
