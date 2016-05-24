@@ -154,6 +154,22 @@ namespace NMib
 		bint fg_SetEnableExceptionTrace(bint _bEnabled);
 		bint fg_SetGlobalEnableExceptionTrace(bint _bEnabled);
 
+#ifdef DMibExceptionTraceEnable
+		struct CDisableExceptionTraceScope
+		{
+			inline CDisableExceptionTraceScope();
+			inline ~CDisableExceptionTraceScope();
+		private:
+			bint mp_bOldEnable;
+		};
+#else
+		struct CDisableExceptionTraceScope
+		{
+			inline CDisableExceptionTraceScope();
+			inline ~CDisableExceptionTraceScope();
+		};
+#endif
+
 #		define DMibImpErrorInstance(d_CClass, d_Description) d_CClass(nullptr, d_Description, false)
 #		define DMibImpError(d_CClass, d_Description) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true)
 #		define DMibImpExceptionInstance(d_CClass, d_Description) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false)

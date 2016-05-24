@@ -43,7 +43,7 @@ namespace NMib
 			return false;
 #endif
 		}
-
+		
 		CExceptionBase &CExceptionBase::operator =(const CExceptionBase&_Other)
 		{
 			m_Magic = mcp_Magic;

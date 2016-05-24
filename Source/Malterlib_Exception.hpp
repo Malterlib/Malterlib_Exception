@@ -68,5 +68,24 @@ namespace NMib
 			m_ErrorNoAlloc[0] = 0;
 		}
 #endif
+		
+#ifdef DMibExceptionTraceEnable
+		CDisableExceptionTraceScope::CDisableExceptionTraceScope()
+			: mp_bOldEnable(fg_SetEnableExceptionTrace(false))
+		{
+		}
+		CDisableExceptionTraceScope::~CDisableExceptionTraceScope()
+		{
+			fg_SetEnableExceptionTrace(mp_bOldEnable);
+		}
+#else
+		CDisableExceptionTraceScope::CDisableExceptionTraceScope()
+		{
+		}
+		
+		CDisableExceptionTraceScope::~CDisableExceptionTraceScope()
+		{
+		}
+#endif
 	}
 }
