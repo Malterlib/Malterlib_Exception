@@ -171,6 +171,22 @@ namespace NMib
 #endif
 		}
 
+		void CCallstack::f_Trace(mint _Indent) const
+		{
+			for (mint i = 0; i < m_CallstackLen; ++i)
+			{
+				CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
+				if (pInfo)
+				{
+					const ch8 *FileName = (pInfo->m_pSourceFileName) ? pInfo->m_pSourceFileName : "**Unknown**";
+					(void)FileName;
+					NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n") << "" << _Indent << FileName << pInfo->m_SourceLine << (pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "")).f_GetStr().f_GetStr());
+
+					NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
+				}
+			}
+		}
+	
 #ifdef DMibExceptionTraceEnable
 		void CExceptionBase::f_TraceException(bool _bTrace) const
 		{
@@ -179,20 +195,7 @@ namespace NMib
 				NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}: {}" DMibNewLine) << m_pFile << m_Line << m_pClass << f_GetErrorCharPointer()).f_GetStr().f_GetStr());
 
 				if (m_pCallstack)
-				{
-					for (mint i = 0; i < m_pCallstack->m_CallstackLen; ++i)
-					{
-						CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_pCallstack->m_Callstack[i]);
-						if (pInfo)
-						{
-							const ch8 *FileName = (pInfo->m_pSourceFileName) ? pInfo->m_pSourceFileName : "**Unknown**";
-							(void)FileName;
-							NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}\n") << FileName << pInfo->m_SourceLine << (pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "")).f_GetStr().f_GetStr());
-
-							NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
-						}
-					}
-				}
+					m_pCallstack->f_Trace(0);
 			}
 		}
 #endif

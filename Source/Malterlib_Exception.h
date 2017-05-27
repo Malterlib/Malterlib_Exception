@@ -23,6 +23,8 @@ namespace NMib
 
 		struct CCallstack
 		{
+			void f_Trace(mint _Indent) const;
+
 			CMibCodeAddress m_Callstack[128];
 			mint m_CallstackLen;
 		};
