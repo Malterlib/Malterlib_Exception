@@ -1,4 +1,4 @@
-﻿// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB 
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #pragma once
@@ -24,6 +24,7 @@ namespace NMib
 		struct CCallstack
 		{
 			void f_Trace(mint _Indent) const;
+			NStr::CStr f_GetString(mint _Indent) const;
 
 			CMibCodeAddress m_Callstack[128];
 			mint m_CallstackLen;
@@ -72,6 +73,7 @@ namespace NMib
 			void f_TraceException(bool _bTrace) const;
 #endif
 			CCallstack const *f_GetCallstack();
+			NStr::CStr f_GetCallstackStr(mint _Indent) const;
 
 			template <typename t_COther>
 			bint operator == (t_COther const &_Other) const

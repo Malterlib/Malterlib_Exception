@@ -1,4 +1,4 @@
-﻿// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB 
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include <Mib/Core/Core>
@@ -186,7 +186,25 @@ namespace NMib
 				}
 			}
 		}
-	
+		
+		NStr::CStr CCallstack::f_GetString(mint _Indent) const
+		{
+			NStr::CStr Output;
+			for (mint i = 0; i < m_CallstackLen; ++i)
+			{
+				CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
+				if (pInfo)
+				{
+					const ch8 *FileName = (pInfo->m_pSourceFileName) ? pInfo->m_pSourceFileName : "**Unknown**";
+					(void)FileName;
+					Output += ((NStr::CStrNonTracked::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n") << "" << _Indent << FileName << pInfo->m_SourceLine << (pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "")).f_GetStr().f_GetStr());
+
+					NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
+				}
+			}
+			return Output;
+		}
+
 #ifdef DMibExceptionTraceEnable
 		void CExceptionBase::f_TraceException(bool _bTrace) const
 		{
@@ -268,6 +286,20 @@ namespace NMib
 			return nullptr;
 		}
 
+		NStr::CStr CExceptionBase::f_GetCallstackStr(mint _Indent) const
+		{
+			if (m_pCallstack)
+			{
+				if (auto *pCallstack = m_pCallstack.f_Get())
+					return pCallstack->f_GetString(_Indent);
+			}
+			else if (m_pCallstackNonTracked)
+			{
+				if (auto *pCallstack = m_pCallstackNonTracked.f_Get())
+					return pCallstack->f_GetString(_Indent);
+			}
+			return "";
+		}
 
 		NStr::CStrNonTracked CExceptionBase::f_GetErrorStrNonTracked() const
 		{
