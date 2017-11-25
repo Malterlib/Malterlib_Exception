@@ -215,8 +215,14 @@ namespace NMib
 			{\
 			public:\
 				template <typename t_CError>\
-				d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
-					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _TypeHash)\
+				d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+				{\
+					DMibImpErrorClass_TypeRegistry(d_CClass);\
+				}\
+				template <typename t_CError>\
+				d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 				{\
 					DMibImpErrorClass_TypeRegistry(d_CClass);\
 				}\
@@ -229,8 +235,15 @@ namespace NMib
 				d_CSpecificType m_SpecificData;\
 			public:\
 				template <typename t_CError>\
-				d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
-					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _TypeHash)\
+				d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+					, m_SpecificData(_SpecificData)\
+				{\
+					DMibImpErrorClass_TypeRegistry(d_CClass);\
+				}\
+				template <typename t_CError>\
+				d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 					, m_SpecificData(_SpecificData)\
 				{\
 					DMibImpErrorClass_TypeRegistry(d_CClass);\
