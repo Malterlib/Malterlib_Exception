@@ -192,14 +192,14 @@ namespace NMib
 		};
 #endif
 
-#		define DMibImpErrorInstance(d_CClass, d_Description) d_CClass(nullptr, d_Description, false)
+#		define DMibImpErrorInstance(d_CClass, d_Description) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false)
 #		define DMibImpError(d_CClass, d_Description) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true)
 #		define DMibImpExceptionInstance(d_CClass, d_Description) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false)
 #		define DMibImpErrorSpecific(d_CClass, d_Description, d_SpecificData) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true, d_SpecificData)
 #		define DMibImpExceptionInstanceSpecific(d_CClass, d_Description, d_SpecificData) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, d_SpecificData)
 
 #		define DMibError(d_Description) throw NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, true)
-#		define DMibErrorInstance(d_Description) NMib::NException::CException("CException", d_Description, false)
+#		define DMibErrorInstance(d_Description) NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, false)
 
 #		ifndef DMibPNoShortCuts
 #			define DExceptionInstance DMibImpExceptionInstance
