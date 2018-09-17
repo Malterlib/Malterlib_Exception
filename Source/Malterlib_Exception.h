@@ -14,12 +14,6 @@ namespace NMib
 	{
 		using CExceptionPointer = std::exception_ptr;
 
-		template <typename tf_CException>
-		CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
-		{
-			return std::make_exception_ptr(fg_Forward<tf_CException>(_Exception));
-		}
-
 		inline_always int fg_UncaughtExceptions()
 		{
 			return std::uncaught_exceptions();
@@ -78,7 +72,7 @@ namespace NMib
 
 			CExceptionBase(const CExceptionBase&_Other);
 			CExceptionBase &operator =(const CExceptionBase&_Other);
-			~CExceptionBase();
+			virtual ~CExceptionBase();
 			const ch8 *f_GetErrorCharPointer() const;
 			NStr::CStr f_GetErrorStr() const;
 			NStr::CStrNonTracked f_GetErrorStrNonTracked() const;
@@ -109,7 +103,9 @@ namespace NMib
 			NStr::CStrFormatTypeClassifier_String f_CreateStringFormatter(t_CFormatter &_Formatter) const;
 			
 			inline_always_debug uint32 f_TypeHash() const;
-			
+
+			virtual CExceptionPointer f_ExceptionPointer() const = 0;
+
 #ifdef DMibRuntimeTypeRegistry
 			template <typename tf_CStream>
 			void f_Feed(tf_CStream &_Stream) const;
@@ -117,6 +113,18 @@ namespace NMib
 			void f_Consume(tf_CStream &_Stream);
 #endif
 		};
+
+		template <typename tf_CException, TCEnableIfType<NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
+		CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
+		{
+			return _Exception.f_ExceptionPointer();
+		}
+
+		template <typename tf_CException, TCEnableIfType<!NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
+		CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
+		{
+			return std::make_exception_ptr(fg_Forward<tf_CException>(_Exception));
+		}
 
 #		ifdef DMibRuntimeTypeRegistry
 #			define DMibException_TypeHash(d_Type) ::NMib::fg_GetTypeHash<d_Type>()
@@ -167,6 +175,11 @@ namespace NMib
 				)
 			{
 				DMibImpErrorClass_TypeRegistry(TCException);
+			}
+
+			CExceptionPointer f_ExceptionPointer() const override
+			{
+				return std::make_exception_ptr(*this);
 			}
 		};
 
@@ -244,6 +257,10 @@ namespace NMib
 				{\
 					DMibImpErrorClass_TypeRegistry(d_CClass);\
 				}\
+				NMib::NException::CExceptionPointer f_ExceptionPointer() const override\
+				{\
+					return std::make_exception_ptr(*this);\
+				}\
 			};\
 			
 
@@ -265,6 +282,10 @@ namespace NMib
 					, m_SpecificData(_SpecificData)\
 				{\
 					DMibImpErrorClass_TypeRegistry(d_CClass);\
+				}\
+				NMib::NException::CExceptionPointer f_ExceptionPointer() const override\
+				{\
+					return std::make_exception_ptr(*this);\
 				}\
 				d_CSpecificType const &f_GetSpecific() const\
 				{\
