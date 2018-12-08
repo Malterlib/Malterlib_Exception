@@ -9,77 +9,72 @@
 #include <Mib/Concurrency/AsyncResult>
 #include <Mib/Test/Exception>
 
-namespace NMib
+namespace NMib::NException
 {
-
-	namespace NException
+	template <typename t_CCatch, typename t_CLambda, typename t_CParent>
+	class TCExceptionalCatch : public t_CParent
 	{
+	public:
 
-		template <typename t_CCatch, typename t_CLambda, typename t_CParent>
-		class TCExceptionalCatch : public t_CParent
+		t_CLambda m_Lambda;
+		inline_always TCExceptionalCatch(t_CLambda _Lambda, t_CParent _Parent)
+			: t_CParent(_Parent)
+			, m_Lambda(_Lambda)
 		{
-		public:
-			
-			t_CLambda m_Lambda;
-			inline_always TCExceptionalCatch(t_CLambda _Lambda, t_CParent _Parent)
-				: t_CParent(_Parent)
-				, m_Lambda(_Lambda)				
-			{
-			}
-
-			template <typename t_CCatch2, typename t_CLambda2>
-			inline_always TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptionalCatch> f_Catch(t_CLambda2 _Lambda) const
-			{
-				return TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptionalCatch>(_Lambda, *this);
-			}
-
-			inline_always void f_Execute() const
-			{
-				try
-				{
-					t_CParent::f_Execute();
-				}
-				catch (const t_CCatch &_Exception)
-				{
-					m_Lambda(_Exception);
-				}
-			}
-		};
-
-		template <typename t_CLambda>
-		class TCExceptional
-		{
-		public:
-
-			t_CLambda m_Lambda;
-			inline_always TCExceptional(t_CLambda _Lambda)
-				: m_Lambda(_Lambda)				
-			{
-			}
-
-			template <typename t_CCatch2, typename t_CLambda2>
-			inline_always TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptional> f_Catch(t_CLambda2 _Lambda) const
-			{
-				return TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptional>(_Lambda, *this);
-			}
-
-			inline_always void f_Execute() const
-			{
-				m_Lambda();
-			}
-		};
-
-		template <typename t_CLambda>
-		inline_always TCExceptional<t_CLambda> fg_Try(const t_CLambda &_Lambda)
-		{
-			return TCExceptional<t_CLambda>(_Lambda);
 		}
 
-		template <typename t_CExceptional>
-		inline_always void fg_Execute(const t_CExceptional &_Lambda)
+		template <typename t_CCatch2, typename t_CLambda2>
+		inline_always TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptionalCatch> f_Catch(t_CLambda2 _Lambda) const
 		{
-			_Lambda.f_Execute();
+			return TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptionalCatch>(_Lambda, *this);
 		}
+
+		inline_always void f_Execute() const
+		{
+			try
+			{
+				t_CParent::f_Execute();
+			}
+			catch (const t_CCatch &_Exception)
+			{
+				m_Lambda(_Exception);
+			}
+		}
+	};
+
+	template <typename t_CLambda>
+	class TCExceptional
+	{
+	public:
+
+		t_CLambda m_Lambda;
+		inline_always TCExceptional(t_CLambda _Lambda)
+			: m_Lambda(_Lambda)
+		{
+		}
+
+		template <typename t_CCatch2, typename t_CLambda2>
+		inline_always TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptional> f_Catch(t_CLambda2 _Lambda) const
+		{
+			return TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptional>(_Lambda, *this);
+		}
+
+		inline_always void f_Execute() const
+		{
+			m_Lambda();
+		}
+	};
+
+	template <typename t_CLambda>
+	inline_always TCExceptional<t_CLambda> fg_Try(const t_CLambda &_Lambda)
+	{
+		return TCExceptional<t_CLambda>(_Lambda);
+	}
+
+	template <typename t_CExceptional>
+	inline_always void fg_Execute(const t_CExceptional &_Lambda)
+	{
+		_Lambda.f_Execute();
 	}
 }
 #ifdef DCompiler_MSVC
