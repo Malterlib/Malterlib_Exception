@@ -85,4 +85,26 @@ namespace NMib::NException
 	{
 	}
 #endif
+
+	struct CExceptionExceptionVectorData
+	{
+		CExceptionExceptionVectorData() = default;
+		CExceptionExceptionVectorData(NContainer::TCVector<CExceptionPointer> &&_Exceptions)
+			: m_Exceptions(_Exceptions)
+		{
+		}
+		
+		template <typename tf_CStream>
+		void f_Stream(tf_CStream &_Stream)
+		{
+			DMibPDebugBreak; // Not valid for streaming
+		}
+
+		NContainer::TCVector<CExceptionPointer> m_Exceptions;
+	};
+
+	DMibImpErrorSpecificClassDefine(CExceptionExceptionVector, CException, CExceptionExceptionVectorData);
+
+#	define DMibErrorExceptionVector(d_Description, d_Specific) DMibImpErrorSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific)
+#	define DMibErrorInstanceExceptionVector(d_Description, d_Specific) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific)
 }
