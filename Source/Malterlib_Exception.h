@@ -39,6 +39,7 @@ namespace NMib::NException
 		CMibCodeAddress m_Callstack[128];
 		mint m_CallstackLen;
 	};
+
 	class CExceptionBase
 	{
 		const static uint32 mcp_Magic = 0xE538CB10;
@@ -112,11 +113,18 @@ namespace NMib::NException
 #endif
 	};
 
+	template <typename t_CException>
+	struct TCIsExcption : public NTraits::TCCompileTimeConstant<bool, NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<t_CException>::CType, CExceptionBase>::mc_Value>
+	{
+	};
+
 	template <typename tf_CException, TCEnableIfType<NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
 	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
 	{
 		return _Exception.f_ExceptionPointer();
 	}
+
+	NStr::CStr fg_ExceptionString(CExceptionPointer const &_pExceptionPointer);
 
 	template <typename tf_CException, TCEnableIfType<!NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
 	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
@@ -125,25 +133,21 @@ namespace NMib::NException
 	}
 
 #		ifdef DMibRuntimeTypeRegistry
-#			define DMibException_TypeHash(d_Type) ::NMib::fg_GetTypeHash<d_Type>()
+#			define DMibException_TypeHash(d_Type) DMibConstantTypeHash(d_Type)
 #			define DMibImpErrorClass_TypeRegistry(d_CClass) DMibConcurrencyRegisterException(d_CClass)
 #		else
 #			define DMibException_TypeHash(d_Type) 0
 #			define DMibImpErrorClass_TypeRegistry(d_CClass) 
 #		endif
 
-	template <typename t_CTag>
-	class TCException : public CExceptionBase
+	class CException : public CExceptionBase
 	{
 	public:
 		template <typename t_CError>
-		TCException(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(TCException))
+		CException(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
 			: CExceptionBase
 			(
-				_pClass ? _pClass
-				: NTraits::TCIsSame<t_CTag, CNormalExceptionTag>::mc_Value ? "CException"
-				: NTraits::TCIsSame<t_CTag, CDebugExceptionTag>::mc_Value ? "CDebugException"
-				: fg_GetTypeName<TCException>()
+				_pClass ? _pClass : "CException"
 				, _pFile
 				, _Line
 				, _pFunction
@@ -153,16 +157,13 @@ namespace NMib::NException
 				, _TypeHash
 			)
 		{
-			DMibImpErrorClass_TypeRegistry(TCException);
+			fp_RegisterTypeRegistry();
 		}
 		template <typename t_CError>
-		TCException(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(TCException))
+		CException(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
 			: CExceptionBase
 			(
-				_pClass ? _pClass
-				: NTraits::TCIsSame<t_CTag, CNormalExceptionTag>::mc_Value ? "CException"
-				: NTraits::TCIsSame<t_CTag, CDebugExceptionTag>::mc_Value ? "CDebugException"
-				: fg_GetTypeName<TCException>()
+				_pClass ? _pClass : "CException"
 				, ""
 				, 0
 				, ""
@@ -172,26 +173,70 @@ namespace NMib::NException
 				, _TypeHash
 			)
 		{
-			DMibImpErrorClass_TypeRegistry(TCException);
+			fp_RegisterTypeRegistry();
 		}
 
-		CExceptionPointer f_ExceptionPointer() const override
-		{
-			return std::make_exception_ptr(*this);
-		}
+		CExceptionPointer f_ExceptionPointer() const override;
+
+		static uint32 ms_TypeHash;
+	private:
+		void fp_RegisterTypeRegistry() const;
 	};
 
-	typedef TCException<CNormalExceptionTag> CException;
-	typedef TCException<CDebugExceptionTag> CDebugException;
+	class CDebugException : public CExceptionBase
+	{
+	public:
+		template <typename t_CError>
+		CDebugException(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
+			: CExceptionBase
+			(
+				_pClass ? _pClass : "CDebugException"
+				, _pFile
+				, _Line
+				, _pFunction
+				, fg_Forward<t_CError>(_Error)
+				, _bTrace
+				, _bStackTrace
+				, _TypeHash
+			)
+		{
+			fp_RegisterTypeRegistry();
+		}
+		template <typename t_CError>
+		CDebugException(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
+			: CExceptionBase
+			(
+				_pClass ? _pClass : "CDebugException"
+				, ""
+				, 0
+				, ""
+				, fg_Forward<t_CError>(_Error)
+				, _bTrace
+				, _bStackTrace
+				, _TypeHash
+			)
+		{
+			fp_RegisterTypeRegistry();
+		}
+
+		CExceptionPointer f_ExceptionPointer() const override;
+
+		static uint32 ms_TypeHash;
+	private:
+		void fp_RegisterTypeRegistry() const;
+	};
 
 	bint fg_SetEnableExceptionTrace(bint _bEnabled);
 	bint fg_SetGlobalEnableExceptionTrace(bint _bEnabled);
 
 #ifdef DMibExceptionTraceEnable
-	struct CDisableExceptionTraceScope
+	struct CDisableExceptionTraceScope final : public CCoroutineThreadLocalHandler
 	{
 		inline CDisableExceptionTraceScope();
 		inline ~CDisableExceptionTraceScope();
+		void f_Suspend() override;
+		void f_Resume() override;
+
 	private:
 		bint mp_bOldEnable;
 	};
@@ -239,67 +284,76 @@ namespace NMib::NException
 #		endif
 
 
-#		define DMibImpErrorClass(d_CClass, d_CParent) \
+#		define DMibImpErrorClassDefine(d_CClass, d_CParent) \
 		class d_CClass : public d_CParent\
 		{\
 		public:\
 			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
 				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 			{\
-				DMibImpErrorClass_TypeRegistry(d_CClass);\
+				fp_RegisterTypeRegistry();\
 			}\
 			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+			d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
 				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 			{\
-				DMibImpErrorClass_TypeRegistry(d_CClass);\
+				fp_RegisterTypeRegistry();\
 			}\
-			NMib::NException::CExceptionPointer f_ExceptionPointer() const override\
+			NMib::NException::CExceptionPointer f_ExceptionPointer() const override;\
+			static uint32 ms_TypeHash;\
+		private:\
+			void fp_RegisterTypeRegistry() const;\
+		};\
+
+#		define DMibImpErrorClassImplement(d_CClass) \
+			uint32 d_CClass::ms_TypeHash = DMibException_TypeHash(d_CClass);\
+			NMib::NException::CExceptionPointer d_CClass::f_ExceptionPointer() const\
 			{\
 				return std::make_exception_ptr(*this);\
 			}\
-		};\
+			void d_CClass::fp_RegisterTypeRegistry() const\
+			{\
+				DMibImpErrorClass_TypeRegistry(d_CClass);\
+			}\
 
 
-#		define DMibImpErrorSpecificClass(d_CClass, d_CParent, d_CSpecificType) \
+#		define DMibImpErrorSpecificClassDefine(d_CClass, d_CParent, d_CSpecificType) \
 		class d_CClass : public d_CParent\
 		{\
 			d_CSpecificType m_SpecificData;\
 		public:\
 			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
 				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 				, m_SpecificData(_SpecificData)\
 			{\
-				DMibImpErrorClass_TypeRegistry(d_CClass);\
+				fp_RegisterTypeRegistry();\
 			}\
 			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = DMibException_TypeHash(d_CClass))\
+			d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
 				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 				, m_SpecificData(_SpecificData)\
 			{\
-				DMibImpErrorClass_TypeRegistry(d_CClass);\
+				fp_RegisterTypeRegistry();\
 			}\
-			NMib::NException::CExceptionPointer f_ExceptionPointer() const override\
-			{\
-				return std::make_exception_ptr(*this);\
-			}\
+			NMib::NException::CExceptionPointer f_ExceptionPointer() const override;\
 			d_CSpecificType const &f_GetSpecific() const\
 			{\
 				return m_SpecificData;\
 			}\
 			DMibImpErrorSpecificClass_Streaming(d_CParent)\
+			static uint32 ms_TypeHash;\
+		private:\
+			void fp_RegisterTypeRegistry() const;\
 		};\
-
-
 
 
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
 	|	Class:				A memory exception										|
 	\*_____________________________________________________________________________*/
 
-	DMibImpErrorClass(CExceptionMemory, CException);
+	DMibImpErrorClassDefine(CExceptionMemory, CException);
 
 #		define DMibErrorMemory(_Description) DMibImpError(NMib::NException::CExceptionMemory, _Description)
 
@@ -311,7 +365,7 @@ namespace NMib::NException
 	|	Class:				A System Implementation exception						|
 	\*_____________________________________________________________________________*/
 
-	DMibImpErrorClass(CExceptionSystemImplementation, CException);
+	DMibImpErrorClassDefine(CExceptionSystemImplementation, CException);
 #		define DMibErrorSystemImp(_Description) DMibImpError(NMib::NException::CExceptionSystemImplementation, _Description)
 
 #		ifndef DMibPNoShortCuts
@@ -322,7 +376,7 @@ namespace NMib::NException
 	|	Class:				A pure call exception									|
 	\*_____________________________________________________________________________*/
 
-	DMibImpErrorClass(CExceptionPureCall, CException);
+	DMibImpErrorClassDefine(CExceptionPureCall, CException);
 #		define DMibErrorPureCall(_Description) DMibImpError(NMib::NException::CExceptionPureCall, _Description)
 
 #		ifndef DMibPNoShortCuts
@@ -333,7 +387,7 @@ namespace NMib::NException
 	|	Class:				A bad function call exception							|
 	\*_____________________________________________________________________________*/
 
-	DMibImpErrorClass(CExceptionBadFunctionCall, CException);
+	DMibImpErrorClassDefine(CExceptionBadFunctionCall, CException);
 #		define DMibErrorBadFunctionCall(_Description) DMibImpError(NMib::NException::CExceptionBadFunctionCall, _Description)
 
 #		ifndef DMibPNoShortCuts
@@ -345,7 +399,7 @@ namespace NMib::NException
 	|	Class:				Safe check exception									|
 	\*_____________________________________________________________________________*/
 
-	DMibImpErrorClass(CExceptionSafeCheck, CDebugException);
+	DMibImpErrorClassDefine(CExceptionSafeCheck, CDebugException);
 #		define DMibErrorSafeCheck(_Description) DMibImpError(NMib::NException::CExceptionSafeCheck, _Description)
 
 #		ifndef DMibPNoShortCuts
@@ -356,7 +410,7 @@ namespace NMib::NException
 
 namespace NMib::NFile
 {
-	DMibImpErrorClass(CExceptionFile, NException::CException);
+	DMibImpErrorClassDefine(CExceptionFile, NException::CException);
 
 #		define DMibErrorFile(_Description) DMibImpError(NMib::NFile::CExceptionFile, _Description)
 

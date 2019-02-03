@@ -43,6 +43,19 @@ namespace NMib::NException
 #endif
 	}
 
+	NStr::CStr fg_ExceptionString(CExceptionPointer const &_pExceptionPointer)
+	{
+		try
+		{
+			std::rethrow_exception(_pExceptionPointer);
+		}
+		catch (NException::CException const &_Exception)
+		{
+			return _Exception.f_GetErrorStr();
+		}
+		return "";
+	}
+
 	CExceptionBase &CExceptionBase::operator =(const CExceptionBase&_Other)
 	{
 		m_Magic = mcp_Magic;
@@ -326,4 +339,52 @@ namespace NMib::NException
 	{
 		return m_Line;
 	}
+
+#ifdef DMibExceptionTraceEnable
+	void CDisableExceptionTraceScope::f_Suspend()
+	{
+		fg_SetEnableExceptionTrace(mp_bOldEnable);
+	}
+
+	void CDisableExceptionTraceScope::f_Resume()
+	{
+		mp_bOldEnable = fg_SetEnableExceptionTrace(false);
+	}
+#endif
+
+	uint32 CException::ms_TypeHash = DMibException_TypeHash(CException);
+
+	CExceptionPointer CException::f_ExceptionPointer() const
+	{
+		return std::make_exception_ptr(*this);
+	}
+
+	void CException::fp_RegisterTypeRegistry() const
+	{
+		DMibImpErrorClass_TypeRegistry(CException);
+	}
+
+	uint32 CDebugException::ms_TypeHash = DMibException_TypeHash(CDebugException);
+
+	CExceptionPointer CDebugException::f_ExceptionPointer() const
+	{
+		return std::make_exception_ptr(*this);
+	}
+
+	void CDebugException::fp_RegisterTypeRegistry() const
+	{
+		DMibImpErrorClass_TypeRegistry(CDebugException);
+	}
+
+	DMibImpErrorClassImplement(CExceptionMemory);
+	DMibImpErrorClassImplement(CExceptionSystemImplementation);
+	DMibImpErrorClassImplement(CExceptionPureCall);
+	DMibImpErrorClassImplement(CExceptionBadFunctionCall);
+	DMibImpErrorClassImplement(CExceptionSafeCheck);
+	DMibImpErrorClassImplement(CExceptionExceptionVector);
+}
+
+namespace NMib::NFile
+{
+	DMibImpErrorClassImplement(CExceptionFile);
 }
