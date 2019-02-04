@@ -133,7 +133,7 @@ namespace NMib::NException
 	}
 
 #		ifdef DMibRuntimeTypeRegistry
-#			define DMibException_TypeHash(d_Type) ::NMib::TCGetTypeHash<d_Type>::mc_Value
+#			define DMibException_TypeHash(d_Type) DMibConstantTypeHash(d_Type)
 #			define DMibImpErrorClass_TypeRegistry(d_CClass) DMibConcurrencyRegisterException(d_CClass)
 #		else
 #			define DMibException_TypeHash(d_Type) 0
