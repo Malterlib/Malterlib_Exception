@@ -183,6 +183,21 @@ namespace NMib::NException
 #endif
 	}
 
+	NStr::CStr CCallstack::f_GetFunctionName(mint _iCallstack) const
+	{
+		if (_iCallstack >= m_CallstackLen)
+			return {};
+
+		CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[_iCallstack]);
+		if (!pInfo || !pInfo->m_pFunctionName)
+			return {};
+		NStr::CStr FunctionName = pInfo->m_pFunctionName;
+		
+		NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
+
+		return FunctionName;
+	}
+
 	void CCallstack::f_Trace(mint _Indent) const
 	{
 		for (mint i = 0; i < m_CallstackLen; ++i)

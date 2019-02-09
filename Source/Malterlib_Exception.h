@@ -35,6 +35,7 @@ namespace NMib::NException
 	{
 		void f_Trace(mint _Indent) const;
 		NStr::CStr f_GetString(mint _Indent) const;
+		NStr::CStr f_GetFunctionName(mint _iCallstack) const;
 
 		CMibCodeAddress m_Callstack[128];
 		mint m_CallstackLen;
