@@ -86,6 +86,28 @@ namespace NMib::NException
 	}
 #endif
 
+	struct CExceptionWrappedData
+	{
+		CExceptionWrappedData() = default;
+		CExceptionWrappedData(CExceptionPointer const &_pWrapped)
+			: m_pWrapped(_pWrapped)
+		{
+		}
+
+		template <typename tf_CStream>
+		void f_Stream(tf_CStream &_Stream)
+		{
+			_Stream % m_pWrapped;
+		}
+
+		CExceptionPointer m_pWrapped;
+	};
+
+	DMibImpErrorSpecificClassDefine(CExceptionWrapped, CException, CExceptionWrappedData);
+
+#	define DMibErrorWrapped(d_Description, d_Specific) DMibImpErrorSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific)
+#	define DMibErrorInstanceWrapped(d_Description, d_Specific) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific)
+
 	struct CExceptionExceptionVectorData
 	{
 		CExceptionExceptionVectorData() = default;
@@ -97,7 +119,7 @@ namespace NMib::NException
 		template <typename tf_CStream>
 		void f_Stream(tf_CStream &_Stream)
 		{
-			DMibPDebugBreak; // Not valid for streaming
+			_Stream % m_Exceptions;
 		}
 
 		NContainer::TCVector<CExceptionPointer> m_Exceptions;
@@ -107,4 +129,29 @@ namespace NMib::NException
 
 #	define DMibErrorExceptionVector(d_Description, d_Specific) DMibImpErrorSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific)
 #	define DMibErrorInstanceExceptionVector(d_Description, d_Specific) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific)
+}
+
+namespace NMib::NConcurrency::NPrivate
+{
+	void fg_FeedException(NStream::CBinaryStreamDefault &_Stream, NException::CExceptionPointer const &_pException);
+	void fg_FeedException(NStream::CBinaryStreamDefault &_Stream, NException::CExceptionBase const &_pException);
+	NException::CExceptionPointer fg_ConsumeException(NStream::CBinaryStreamDefault &_Stream);
+}
+
+namespace NMib::NStream
+{
+	template <typename t_CStream>
+	class TCBinaryStreamTypeReference<t_CStream, NException::CExceptionPointer>
+	{
+	public:
+		static void fs_Feed(t_CStream &_Stream, NException::CExceptionPointer const &_Data)
+		{
+			NConcurrency::NPrivate::fg_FeedException(_Stream, _Data);
+		}
+
+		static void fs_Consume(t_CStream &_Stream, NException::CExceptionPointer &_Data)
+		{
+			_Data = NConcurrency::NPrivate::fg_ConsumeException(_Stream);
+		}
+	};
 }

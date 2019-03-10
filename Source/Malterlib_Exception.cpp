@@ -397,6 +397,7 @@ namespace NMib::NException
 	DMibImpErrorClassImplement(CExceptionBadFunctionCall);
 	DMibImpErrorClassImplement(CExceptionSafeCheck);
 	DMibImpErrorClassImplement(CExceptionExceptionVector);
+	DMibImpErrorClassImplement(CExceptionWrapped);
 }
 
 namespace NMib::NFile
