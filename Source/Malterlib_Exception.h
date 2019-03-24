@@ -249,19 +249,19 @@ namespace NMib::NException
 	};
 #endif
 
-#		define DMibImpErrorInstance(d_CClass, d_Description) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false)
-#		define DMibImpError(d_CClass, d_Description) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true)
-#		define DMibImpExceptionInstance(d_CClass, d_Description) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false)
-#		define DMibImpErrorSpecific(d_CClass, d_Description, d_SpecificData) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true, d_SpecificData)
-#		define DMibImpExceptionInstanceSpecific(d_CClass, d_Description, d_SpecificData) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, d_SpecificData)
+#		define DMibImpErrorInstance(d_CClass, d_Description, ...) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, ##__VA_ARGS__)
+#		define DMibImpError(d_CClass, d_Description, ...) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true, ##__VA_ARGS__)
+#		define DMibImpExceptionInstance(d_CClass, d_Description, ...) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, ##__VA_ARGS__)
+#		define DMibImpErrorSpecific(d_CClass, d_Description, d_SpecificData, ...) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true, d_SpecificData, ##__VA_ARGS__)
+#		define DMibImpExceptionInstanceSpecific(d_CClass, d_Description, d_SpecificData, ...) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, d_SpecificData, ##__VA_ARGS__)
 
-#		define DMibError(d_Description) throw NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, true)
-#		define DMibErrorInstance(d_Description) NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, false)
+#		define DMibError(d_Description, ...) throw NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, true, ##__VA_ARGS__)
+#		define DMibErrorInstance(d_Description, ...) NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, false, ##__VA_ARGS__)
 
 #		ifndef DMibPNoShortCuts
 #			define DExceptionInstance DMibImpExceptionInstance
-#			define DError(d_Description) DMibError(d_Description)
-#			define DErrorInstance(d_Description) DMibErrorInstance(d_Description)
+#			define DError DMibError
+#			define DErrorInstance DMibErrorInstance
 #		endif
 
 #		ifdef DMibRuntimeTypeRegistry
@@ -348,7 +348,6 @@ namespace NMib::NException
 		private:\
 			void fp_RegisterTypeRegistry() const;\
 		};\
-
 
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
 	|	Class:				A memory exception										|

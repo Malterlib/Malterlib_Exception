@@ -105,8 +105,8 @@ namespace NMib::NException
 
 	DMibImpErrorSpecificClassDefine(CExceptionWrapped, CException, CExceptionWrappedData);
 
-#	define DMibErrorWrapped(d_Description, d_Specific) DMibImpErrorSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific)
-#	define DMibErrorInstanceWrapped(d_Description, d_Specific) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific)
+#	define DMibErrorWrapped(d_Description, d_Specific, ...) DMibImpErrorSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific, ##__VA_ARGS__)
+#	define DMibErrorInstanceWrapped(d_Description, d_Specific, ...) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific, ##__VA_ARGS__)
 
 	struct CExceptionExceptionVectorData
 	{
@@ -127,8 +127,8 @@ namespace NMib::NException
 
 	DMibImpErrorSpecificClassDefine(CExceptionExceptionVector, CException, CExceptionExceptionVectorData);
 
-#	define DMibErrorExceptionVector(d_Description, d_Specific) DMibImpErrorSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific)
-#	define DMibErrorInstanceExceptionVector(d_Description, d_Specific) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific)
+#	define DMibErrorExceptionVector(d_Description, d_Specific, ...) DMibImpErrorSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
+#	define DMibErrorInstanceExceptionVector(d_Description, d_Specific, ...) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
 }
 
 namespace NMib::NConcurrency::NPrivate
