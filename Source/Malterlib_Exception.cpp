@@ -198,6 +198,112 @@ namespace NMib::NException
 		return FunctionName;
 	}
 
+	NStr::CStrNonTracked CCallstack::fs_ShortenFunctionName(ch8 const *_pFunction)
+	{
+		NStr::CStrNonTracked FunctionName;
+		NStr::CStrNonTracked ClassName;
+
+		mint nOpen = 0;
+		ch8 const *pParse = _pFunction;
+		ch8 const *pIdentStart = pParse;
+		bool bFoundFunction = false;
+		while (*pParse)
+		{
+			if (NStr::fg_StrStartsWith(pParse, "operator>>"))
+			{
+				pParse += 10;
+				continue;
+			}
+			if (NStr::fg_StrStartsWith(pParse, "operator<<"))
+			{
+				pParse += 10;
+				continue;
+			}
+			if (NStr::fg_StrStartsWith(pParse, "operator>"))
+			{
+				pParse += 9;
+				continue;
+			}
+			if (NStr::fg_StrStartsWith(pParse, "operator<"))
+			{
+				pParse += 9;
+				continue;
+			}
+			if (NStr::fg_StrStartsWith(pParse, "operator()"))
+			{
+				pParse += 10;
+				continue;
+			}
+			if (NStr::fg_StrStartsWith(pParse, "operator[]"))
+			{
+				pParse += 10;
+				continue;
+			}
+			if (*pParse == '<')
+			{
+				if (nOpen == 0)
+				{
+					if (ClassName.f_IsEmpty())
+						ClassName.f_AddStr(pIdentStart, pParse - pIdentStart);
+					else if (FunctionName.f_IsEmpty())
+						FunctionName.f_AddStr(pIdentStart, pParse - pIdentStart);
+					pIdentStart = pParse;
+				}
+				++nOpen;
+			}
+			else if (*pParse == '(')
+			{
+				if (nOpen == 0)
+				{
+					bFoundFunction = true;
+					if (FunctionName.f_IsEmpty())
+						FunctionName.f_AddStr(pIdentStart, pParse - pIdentStart);
+					pIdentStart = pParse;
+				}
+				++nOpen;
+			}
+			else if (*pParse == '[')
+				++nOpen;
+			else if (*pParse == ')' || *pParse == '>' || *pParse == ']')
+			{
+				--nOpen;
+				if (nOpen == 0)
+				{
+					pIdentStart = pParse + 1;
+					if (*pParse == '>')
+					{
+						while (*pIdentStart == ':')
+							++pIdentStart;
+					}
+				}
+			}
+			else if (nOpen == 0)
+			{
+				if (*pParse == ' ')
+				{
+					if (!bFoundFunction)
+					{
+						FunctionName.f_Clear();
+						ClassName.f_Clear();
+					}
+
+					pIdentStart = pParse + 1;
+				}
+			}
+
+			++pParse;
+		}
+
+		if (!bFoundFunction)
+			return _pFunction;
+		else if (!FunctionName.f_IsEmpty() && !ClassName.f_IsEmpty())
+			return NStr::fg_Format("{}::{}()", ClassName, FunctionName);
+		else if (FunctionName.f_IsEmpty())
+			return ClassName + "{}";
+
+		return _pFunction;
+	}
+
 	void CCallstack::f_Trace(mint _Indent) const
 	{
 		for (mint i = 0; i < m_CallstackLen; ++i)
@@ -205,9 +311,26 @@ namespace NMib::NException
 			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
 			if (pInfo)
 			{
-				const ch8 *FileName = (pInfo->m_pSourceFileName) ? pInfo->m_pSourceFileName : "**Unknown**";
-				(void)FileName;
-				NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n") << "" << _Indent << FileName << pInfo->m_SourceLine << (pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "")).f_GetStr().f_GetStr());
+				NStr::CStrNonTracked FunctionName = fs_ShortenFunctionName(pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "");
+
+				if (pInfo->m_pSourceFileName)
+				{
+					NSys::fg_DebugOutput
+						(
+						 	(
+							 	NStr::CStrNonTracked::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n")
+							 	<< ""
+							 	<< _Indent
+							 	<< pInfo->m_pSourceFileName
+							 	<< pInfo->m_SourceLine
+							 	<< FunctionName
+							)
+						 	.f_GetStr().f_GetStr()
+						)
+					;
+				}
+				else
+					NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat("{sf ,sj*}{}\n") << "" << _Indent << FunctionName).f_GetStr().f_GetStr());
 
 				NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
 			}
@@ -222,9 +345,12 @@ namespace NMib::NException
 			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
 			if (pInfo)
 			{
-				const ch8 *FileName = (pInfo->m_pSourceFileName) ? pInfo->m_pSourceFileName : "**Unknown**";
-				(void)FileName;
-				Output += ((NStr::CStrNonTracked::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n") << "" << _Indent << FileName << pInfo->m_SourceLine << (pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "")).f_GetStr().f_GetStr());
+				NStr::CStrNonTracked FunctionName = fs_ShortenFunctionName(pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "");
+
+				if (pInfo->m_pSourceFileName)
+					Output += NStr::CStr::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n") << "" << _Indent << pInfo->m_pSourceFileName << pInfo->m_SourceLine << FunctionName;
+				else
+					Output += NStr::CStr::CFormat("{sf ,sj*}{}\n") << "" << _Indent << FunctionName;
 
 				NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
 			}
@@ -303,7 +429,7 @@ namespace NMib::NException
 			return NStr::CStr(m_ErrorNoAlloc);
 	}
 
-	CCallstack const *CExceptionBase::f_GetCallstack()
+	CCallstack const *CExceptionBase::f_GetCallstack() const
 	{
 		if (m_pCallstack)
 			return m_pCallstack.f_Get();

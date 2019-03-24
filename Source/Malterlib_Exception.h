@@ -36,6 +36,8 @@ namespace NMib::NException
 		void f_Trace(mint _Indent) const;
 		NStr::CStr f_GetString(mint _Indent) const;
 		NStr::CStr f_GetFunctionName(mint _iCallstack) const;
+		static NStr::CStrNonTracked fs_ShortenFunctionName(ch8 const *_pFunction);
+
 
 		CMibCodeAddress m_Callstack[128];
 		mint m_CallstackLen;
@@ -84,7 +86,7 @@ namespace NMib::NException
 #ifdef DMibExceptionTraceEnable
 		void f_TraceException(bool _bTrace) const;
 #endif
-		CCallstack const *f_GetCallstack();
+		CCallstack const *f_GetCallstack() const;
 		NStr::CStr f_GetCallstackStr(mint _Indent) const;
 
 		template <typename t_COther>
