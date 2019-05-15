@@ -269,18 +269,18 @@ namespace NMib::NException
 #		ifdef DMibRuntimeTypeRegistry
 
 #			define DMibImpErrorSpecificClass_Streaming(d_CParent) \
-			template <typename tf_CStream>\
-			void f_Feed(tf_CStream &_Stream) const\
-			{\
-				d_CParent::f_Feed(_Stream);\
-				_Stream << m_SpecificData;\
-			}\
-			template <typename tf_CStream>\
-			void f_Consume(tf_CStream &_Stream)\
-			{\
-				d_CParent::f_Consume(_Stream);\
-				_Stream >> m_SpecificData;\
-			}
+				template <typename tf_CStream>\
+				void f_Feed(tf_CStream &_Stream) const\
+				{\
+					d_CParent::f_Feed(_Stream);\
+					_Stream << m_SpecificData;\
+				}\
+				template <typename tf_CStream>\
+				void f_Consume(tf_CStream &_Stream)\
+				{\
+					d_CParent::f_Consume(_Stream);\
+					_Stream >> m_SpecificData;\
+				}
 
 #		else
 #			define DMibImpErrorSpecificClass_Streaming(d_CParent)
@@ -288,29 +288,31 @@ namespace NMib::NException
 
 
 #		define DMibImpErrorClassDefine(d_CClass, d_CParent) \
-		class d_CClass : public d_CParent\
-		{\
-		public:\
-			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
-				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+			class d_CClass : public d_CParent\
 			{\
-				fp_RegisterTypeRegistry();\
-			}\
-			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
-				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
-			{\
-				fp_RegisterTypeRegistry();\
-			}\
-			NMib::NException::CExceptionPointer f_ExceptionPointer() const override;\
-			static uint32 ms_TypeHash;\
-		private:\
-			void fp_RegisterTypeRegistry() const;\
-		};\
+			public:\
+				template <typename t_CError>\
+				d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+				{\
+					fp_RegisterTypeRegistry();\
+				}\
+				template <typename t_CError>\
+				d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+					: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+				{\
+					fp_RegisterTypeRegistry();\
+				}\
+				~d_CClass();\
+				NMib::NException::CExceptionPointer f_ExceptionPointer() const override;\
+				static uint32 ms_TypeHash;\
+			private:\
+				void fp_RegisterTypeRegistry() const;\
+			};
 
 #		define DMibImpErrorClassImplement(d_CClass) \
 			uint32 d_CClass::ms_TypeHash = DMibException_TypeHash(d_CClass);\
+			d_CClass::~ d_CClass() = default;\
 			NMib::NException::CExceptionPointer d_CClass::f_ExceptionPointer() const\
 			{\
 				return std::make_exception_ptr(*this);\
@@ -318,7 +320,7 @@ namespace NMib::NException
 			void d_CClass::fp_RegisterTypeRegistry() const\
 			{\
 				DMibImpErrorClass_TypeRegistry(d_CClass);\
-			}\
+			}
 
 
 #		define DMibImpErrorSpecificClassDefine(d_CClass, d_CParent, d_CSpecificType) \
@@ -345,6 +347,7 @@ namespace NMib::NException
 			{\
 				return m_SpecificData;\
 			}\
+			~d_CClass();\
 			DMibImpErrorSpecificClass_Streaming(d_CParent)\
 			static uint32 ms_TypeHash;\
 		private:\
