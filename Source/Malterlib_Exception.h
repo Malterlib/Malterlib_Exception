@@ -82,7 +82,7 @@ namespace NMib::NException
 		const ch8 *f_GetFile() const;
 		const ch8 *f_GetFunction() const;
 		int32 f_GetLine() const;
-		bint f_IsValid() const;
+		bool f_IsValid() const;
 #ifdef DMibExceptionTraceEnable
 		void f_TraceException(bool _bTrace) const;
 #endif
@@ -90,7 +90,7 @@ namespace NMib::NException
 		NStr::CStr f_GetCallstackStr(mint _Indent) const;
 
 		template <typename t_COther>
-		bint operator == (t_COther const &_Other) const
+		bool operator == (t_COther const &_Other) const
 		{
 			return NStr::fg_StrCmp(f_GetErrorCharPointer(), _Other.f_GetErrorCharPointer()) == 0
 				&& NStr::fg_StrCmp(f_GetClass(), _Other.f_GetClass()) == 0
@@ -229,8 +229,8 @@ namespace NMib::NException
 		void fp_RegisterTypeRegistry() const;
 	};
 
-	bint fg_SetEnableExceptionTrace(bint _bEnabled);
-	bint fg_SetGlobalEnableExceptionTrace(bint _bEnabled);
+	bool fg_SetEnableExceptionTrace(bool _bEnabled);
+	bool fg_SetGlobalEnableExceptionTrace(bool _bEnabled);
 
 #ifdef DMibExceptionTraceEnable
 	struct CDisableExceptionTraceScope final : public CCoroutineThreadLocalHandler
@@ -241,7 +241,7 @@ namespace NMib::NException
 		void f_Resume() override;
 
 	private:
-		bint mp_bOldEnable;
+		bool mp_bOldEnable;
 	};
 #else
 	struct CDisableExceptionTraceScope

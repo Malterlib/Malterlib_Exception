@@ -14,17 +14,17 @@ namespace NMib::NException
 #ifdef DMibExceptionTraceEnable
 	namespace
 	{
-		NStorage::TCAggregate<NMib::NThread::TCThreadLocal<TCAutoClearInt<bint, true>, NMib::NMemory::CAllocator_NonTrackedHeap, NMib::NThread::EThreadLocalFlag_Inherit>, 64>
+		NStorage::TCAggregate<NMib::NThread::TCThreadLocal<TCAutoClearInt<bool, true>, NMib::NMemory::CAllocator_NonTrackedHeap, NMib::NThread::EThreadLocalFlag_Inherit>, 64>
 			g_EnableExceptionTrace = {DAggregateInit}
 		;
 		bool g_EnableGlobalExceptionTrace = true;
 	}
 #endif
 
-	bint fg_SetGlobalEnableExceptionTrace(bint _bEnabled)
+	bool fg_SetGlobalEnableExceptionTrace(bool _bEnabled)
 	{
 #ifdef DMibExceptionTraceEnable
-		bint bOld = g_EnableGlobalExceptionTrace;
+		bool bOld = g_EnableGlobalExceptionTrace;
 		g_EnableGlobalExceptionTrace = _bEnabled;
 		return bOld;
 #else
@@ -32,10 +32,10 @@ namespace NMib::NException
 #endif
 	}
 
-	bint fg_SetEnableExceptionTrace(bint _bEnabled)
+	bool fg_SetEnableExceptionTrace(bool _bEnabled)
 	{
 #ifdef DMibExceptionTraceEnable
-		bint bOld = **g_EnableExceptionTrace;
+		bool bOld = **g_EnableExceptionTrace;
 		**g_EnableExceptionTrace = _bEnabled;
 		return bOld;
 #else
@@ -404,7 +404,7 @@ namespace NMib::NException
 	{
 	}
 
-	bint CExceptionBase::f_IsValid() const
+	bool CExceptionBase::f_IsValid() const
 	{
 		return m_Magic == mcp_Magic;
 	}
