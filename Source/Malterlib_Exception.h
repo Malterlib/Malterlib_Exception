@@ -322,6 +322,17 @@ namespace NMib::NException
 				DMibImpErrorClass_TypeRegistry(d_CClass);\
 			}
 
+#        define DMibImpErrorClassImplementWithNamespace(d_Namespace, d_CClass) \
+            uint32 d_Namespace::d_CClass::ms_TypeHash = DMibException_TypeHash(d_Namespace::d_CClass);\
+            d_Namespace::d_CClass::~ d_CClass() = default;\
+            NMib::NException::CExceptionPointer d_Namespace::d_CClass::f_ExceptionPointer() const\
+            {\
+                return std::make_exception_ptr(*this);\
+            }\
+            void d_Namespace::d_CClass::fp_RegisterTypeRegistry() const\
+            {\
+                DMibImpErrorClass_TypeRegistry(d_Namespace::d_CClass);\
+            }
 
 #		define DMibImpErrorSpecificClassDefine(d_CClass, d_CParent, d_CSpecificType) \
 		class d_CClass : public d_CParent\
