@@ -112,7 +112,7 @@ namespace NMib::NException
 	{
 		CExceptionExceptionVectorData() = default;
 		CExceptionExceptionVectorData(NContainer::TCVector<CExceptionPointer> &&_Exceptions)
-			: m_Exceptions(_Exceptions)
+			: m_Exceptions(fg_Move(_Exceptions))
 		{
 		}
 		
