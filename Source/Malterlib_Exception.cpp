@@ -14,7 +14,7 @@ namespace NMib::NException
 #ifdef DMibExceptionTraceEnable
 	namespace
 	{
-		NStorage::TCAggregate<NMib::NThread::TCThreadLocal<TCAutoClearInt<bool, true>, NMib::NMemory::CAllocator_NonTrackedHeap, NMib::NThread::EThreadLocalFlag_Inherit>, 64>
+		constinit NStorage::TCAggregate<NMib::NThread::TCThreadLocal<TCAutoClearInt<bool, true>, NMib::NMemory::CAllocator_NonTrackedHeap, NMib::NThread::EThreadLocalFlag_Inherit>, 64>
 			g_EnableExceptionTrace = {DAggregateInit}
 		;
 		bool g_EnableGlobalExceptionTrace = true;
