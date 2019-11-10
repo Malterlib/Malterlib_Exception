@@ -89,8 +89,7 @@ namespace NMib::NException
 		CCallstack const *f_GetCallstack() const;
 		NStr::CStr f_GetCallstackStr(mint _Indent) const;
 
-		template <typename t_COther>
-		bool operator == (t_COther const &_Other) const
+		bool operator == (CExceptionBase const &_Other) const
 		{
 			return NStr::fg_StrCmp(f_GetErrorCharPointer(), _Other.f_GetErrorCharPointer()) == 0
 				&& NStr::fg_StrCmp(f_GetClass(), _Other.f_GetClass()) == 0
