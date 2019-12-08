@@ -5,9 +5,9 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 %Group "{Malterlib}/{Lib_Malterlib_Exception}"
 {
-	%Group Exception
+	%Group "Exception"
 	{
-		%Group Include
+		%Group "Include"
 		{
 			Compile.Type "C++"
 			{
@@ -16,7 +16,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 			%File "Include/Mib/Exception/^*"
 		}
 		%File "Source/*"
-		%Group Documentation
+		%Group "Documentation"
 		{
 			%File "Documentation/*"
 		}
@@ -55,7 +55,7 @@ Property
 }
 
 
-%Target Exe_MalterlibTests_NoMalterlib
+%Target "Exe_MalterlibTests_NoMalterlib"
 {
 	!!PlatformFamily "Emscripten"
 	!!PlatformFamily "Windows"
@@ -64,15 +64,15 @@ Property
 	}
 	Compile
 	{
-		!!CompileDialect C
+		!!CompileDialect "C"
 		PrefixHeader ""
 	}
 	Target
 	{
 		BaseName "MalterlibTests_NoMalterlib"
 	}
-	%Group Source
+	%Group "Source"
 	{
-		%File ../../../Exception/Test/Test_Malterlib_Exception_StdLib.cpp
+		%File "../../../Exception/Test/Test_Malterlib_Exception_StdLib.cpp"
 	}
 }
