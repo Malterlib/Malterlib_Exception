@@ -38,9 +38,8 @@ namespace NMib::NException
 		NStr::CStr f_GetFunctionName(mint _iCallstack) const;
 		static NStr::CStrNonTracked fs_ShortenFunctionName(ch8 const *_pFunction);
 
-
 		CMibCodeAddress m_Callstack[128];
-		mint m_CallstackLen;
+		mint m_CallstackLen = 0;
 	};
 
 	class CExceptionBase
