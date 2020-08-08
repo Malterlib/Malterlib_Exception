@@ -76,3 +76,44 @@ Property
 		%File "../../../Exception/Test/Test_Malterlib_Exception_StdLib.cpp"
 	}
 }
+
+Property
+{
+	MalterlibException_SupportStackTraces false // User(Debug)=true: Set to true to enable stack tracing for exceptions
+	{
+		!!MalterlibException_SupportStackTraces ""
+	}
+}
+
+Compile
+{
+	!!LanguageFamily ".NET"
+
+	PreprocessorDefines "DMibConfig_Exception_SupportStackTraces;@(Compile.PreprocessorDefines)"
+	{
+		!!MalterlibException_SupportStackTraces true
+	}
+}
+
+// C and C++ Settings
+Compile
+{
+	&
+	{
+		LanguageFamily "Native"
+		|
+		{
+			CompileDialect "C"
+		}
+	}
+
+	PreprocessorDefines "DMibConfig_Exception_SupportStackTraces=1;@(Compile.PreprocessorDefines)"
+	{
+		!!MalterlibException_SupportStackTraces true
+	}
+	PreprocessorDefines "DMibConfig_Exception_SupportStackTraces=0;@(Compile.PreprocessorDefines)"
+	{
+		!!MalterlibException_SupportStackTraces false
+	}
+}
+

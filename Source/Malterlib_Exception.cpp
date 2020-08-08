@@ -106,12 +106,13 @@ namespace NMib::NException
 
 	void CExceptionBase::fp_Construct(const ch8 *_pError, bool _bTrace, bool _bStackTrace)
 	{
+#if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
 			m_pCallstack = fg_Construct();
 			m_pCallstack->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstack->m_Callstack, 128);
 		}
-
+#endif
 		if (NStr::fg_StrLen(_pError) > 127)
 		{
 			m_pErrorAlloc = fg_Construct(_pError);
@@ -126,11 +127,13 @@ namespace NMib::NException
 
 	void CExceptionBase::fp_ConstructNonTracked(const ch8 *_pError, bool _bTrace, bool _bStackTrace)
 	{
+#if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
 			m_pCallstackNonTracked = fg_Construct();
 			m_pCallstackNonTracked->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstackNonTracked->m_Callstack, 128);
 		}
+#endif
 		if (NStr::fg_StrLen(_pError) > 127)
 		{
 			m_pErrorAllocNonTracked = fg_Construct(_pError);
@@ -153,11 +156,13 @@ namespace NMib::NException
 		, m_TypeHash(_TypeHash)
 	{
 		m_ErrorNoAlloc[0] = 0;
+#if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
 			m_pCallstack = fg_Construct();
 			m_pCallstack->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstack->m_Callstack, 128);
 		}
+#endif
 #ifdef DMibExceptionTraceEnable
 		f_TraceException(_bTrace);
 #endif
@@ -173,11 +178,13 @@ namespace NMib::NException
 		, m_TypeHash(_TypeHash)
 	{
 		m_ErrorNoAlloc[0] = 0;
+#if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
 			m_pCallstackNonTracked = fg_Construct();
 			m_pCallstackNonTracked->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstackNonTracked->m_Callstack, 128);
 		}
+#endif
 #ifdef DMibExceptionTraceEnable
 		f_TraceException(_bTrace);
 #endif
@@ -379,13 +386,13 @@ namespace NMib::NException
 		, m_Line(_Line)
 		, m_TypeHash(_TypeHash)
 	{
-
+#if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
 			m_pCallstack = fg_Construct();
 			m_pCallstack->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstack->m_Callstack, 128);
 		}
-
+#endif
 		if (NStr::fg_StrLen(_pError) > 127)
 		{
 			m_pErrorAlloc = fg_Construct(_pError);
