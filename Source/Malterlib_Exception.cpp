@@ -14,7 +14,18 @@ namespace NMib::NException
 #ifdef DMibExceptionTraceEnable
 	namespace
 	{
-		constinit NStorage::TCAggregate<NMib::NThread::TCThreadLocal<TCAutoClearInt<bool, true>, NMib::NMemory::CAllocator_NonTrackedHeap, NMib::NThread::EThreadLocalFlag_Inherit>, 64>
+		struct CEnableExceptionTraceThreadLocal
+		{
+			CEnableExceptionTraceThreadLocal() = default;
+			CEnableExceptionTraceThreadLocal(CEnableExceptionTraceThreadLocal const &_Other)
+				: m_bEnableTrace(_Other.m_bEnableTrace.f_Load())
+			{
+			}
+
+			NAtomic::TCAtomic<bool> m_bEnableTrace = true;
+		};
+
+		constinit NStorage::TCAggregate<NMib::NThread::TCThreadLocal<CEnableExceptionTraceThreadLocal, NMib::NMemory::CAllocator_NonTrackedHeap, NMib::NThread::EThreadLocalFlag_Inherit>, 64>
 			g_EnableExceptionTrace = {DAggregateInit}
 		;
 		bool g_EnableGlobalExceptionTrace = true;
@@ -35,8 +46,9 @@ namespace NMib::NException
 	bool fg_SetEnableExceptionTrace(bool _bEnabled)
 	{
 #ifdef DMibExceptionTraceEnable
-		bool bOld = **g_EnableExceptionTrace;
-		**g_EnableExceptionTrace = _bEnabled;
+		auto &ThreadLocal = **g_EnableExceptionTrace;
+		bool bOld = ThreadLocal.m_bEnableTrace.f_Load();
+		ThreadLocal.m_bEnableTrace = _bEnabled;
 		return bOld;
 #else
 		return false;
@@ -368,7 +380,7 @@ namespace NMib::NException
 #ifdef DMibExceptionTraceEnable
 	void CExceptionBase::f_TraceException(bool _bTrace) const
 	{
-		if (_bTrace && **g_EnableExceptionTrace)
+		if (_bTrace && (**g_EnableExceptionTrace).m_bEnableTrace.f_Load(NAtomic::EMemoryOrder_Relaxed))
 		{
 			NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}: {}" DMibNewLine) << m_pFile << m_Line << m_pClass << f_GetErrorCharPointer()).f_GetStr().f_GetStr());
 
