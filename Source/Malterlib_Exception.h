@@ -126,6 +126,7 @@ namespace NMib::NException
 	}
 
 	NStr::CStr fg_ExceptionString(CExceptionPointer const &_pExceptionPointer);
+	NStr::CStr fg_CurrentExceptionString();
 
 	template <typename tf_CException, TCEnableIfType<!NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
 	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)

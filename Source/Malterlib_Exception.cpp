@@ -68,6 +68,20 @@ namespace NMib::NException
 		return "";
 	}
 
+	NStr::CStr fg_CurrentExceptionString()
+	{
+		try
+		{
+			std::rethrow_exception(fg_CurrentException());
+		}
+		catch (NException::CException const &_Exception)
+		{
+			return _Exception.f_GetErrorStr();
+		}
+		return "";
+	}
+	
+
 	CExceptionBase &CExceptionBase::operator =(const CExceptionBase&_Other)
 	{
 		m_Magic = mcp_Magic;
