@@ -26,20 +26,13 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 Property
 {
-	MalterlibLibrary_Exception true
-	{
-		&
-		{
-			MalterlibLibrary_Exception ""
-			MalterlibLibrary_All true
-		}
-	}
-	MalterlibSubLibraries "Exception;@(MalterlibSubLibraries)"
+	MalterlibLibrary_Exception define bool = MalterlibLibrary_All
+	MalterlibSubLibraries =+ "Exception"
 	{
 		!!MalterlibLibrary_Exception true
 	}
-//	MalterlibSubLibrarySeparate_Lib_Malterlib_Exception true
-	MalterlibIncludeRoots "@('Include'->MakeAbsolute());@(MalterlibIncludeRoots)"
+//	MalterlibSubLibrarySeparate_Lib_Malterlib_Exception define bool = true
+	MalterlibIncludeRoots =+ "Include"->MakeAbsolute()
 	{
 		!!MalterlibLibrary_Exception true
 	}
@@ -49,9 +42,9 @@ Property
 {
 	!!MalterlibEnableInternalTests true
 	
-	MalterlibTests "Malterlib_Exception;@(MalterlibTests)"
-	MalterlibTestFiles_Malterlib_Exception "@('Test/*'->MakeAbsolute())"
-	MalterlibTestDependencies_Malterlib_Exception "Lib_Malterlib_Concurrency"
+	MalterlibTests =+ "Malterlib_Exception"
+	MalterlibTestFiles_Malterlib_Exception define [type(CEntity)] = ["Test/*"->MakeAbsolute()]
+	MalterlibTestDependencies_Malterlib_Exception define [type(CEntity)] = ["Lib_Malterlib_Concurrency"]
 }
 
 
@@ -65,7 +58,7 @@ Property
 	Compile
 	{
 		!!CompileDialect "C"
-		PrefixHeader ""
+		PrefixHeader undefined
 	}
 	Target
 	{
@@ -79,17 +72,14 @@ Property
 
 Property
 {
-	MalterlibException_SupportStackTraces false // User(Debug)=true: Set to true to enable stack tracing for exceptions
-	{
-		!!MalterlibException_SupportStackTraces ""
-	}
+	MalterlibException_SupportStackTraces define bool = false // User(Debug)=true: Set to true to enable stack tracing for exceptions
 }
 
 Compile
 {
 	!!LanguageFamily ".NET"
 
-	PreprocessorDefines "DMibConfig_Exception_SupportStackTraces;@(Compile.PreprocessorDefines)"
+	PreprocessorDefines += "DMibConfig_Exception_SupportStackTraces"
 	{
 		!!MalterlibException_SupportStackTraces true
 	}
@@ -107,11 +97,11 @@ Compile
 		}
 	}
 
-	PreprocessorDefines "DMibConfig_Exception_SupportStackTraces=1;@(Compile.PreprocessorDefines)"
+	PreprocessorDefines += "DMibConfig_Exception_SupportStackTraces=1"
 	{
 		!!MalterlibException_SupportStackTraces true
 	}
-	PreprocessorDefines "DMibConfig_Exception_SupportStackTraces=0;@(Compile.PreprocessorDefines)"
+	PreprocessorDefines += "DMibConfig_Exception_SupportStackTraces=0"
 	{
 		!!MalterlibException_SupportStackTraces false
 	}
