@@ -80,7 +80,13 @@ namespace NMib::NException
 		}
 		return "";
 	}
-	
+
+	bool CExceptionBase::operator == (CExceptionBase const &_Other) const
+	{
+		return NStr::fg_StrCmp(f_GetErrorCharPointer(), _Other.f_GetErrorCharPointer()) == 0
+			&& NStr::fg_StrCmp(f_GetClass(), _Other.f_GetClass()) == 0
+		;
+	}
 
 	CExceptionBase &CExceptionBase::operator =(const CExceptionBase&_Other)
 	{

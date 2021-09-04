@@ -88,12 +88,7 @@ namespace NMib::NException
 		CCallstack const *f_GetCallstack() const;
 		NStr::CStr f_GetCallstackStr(mint _Indent) const;
 
-		bool operator == (CExceptionBase const &_Other) const
-		{
-			return NStr::fg_StrCmp(f_GetErrorCharPointer(), _Other.f_GetErrorCharPointer()) == 0
-				&& NStr::fg_StrCmp(f_GetClass(), _Other.f_GetClass()) == 0
-			;
-		}
+		bool operator == (CExceptionBase const &_Other) const;
 
 		template <typename t_CFormatter>
 		int f_GetStringFormatType(t_CFormatter &_Formatter);
