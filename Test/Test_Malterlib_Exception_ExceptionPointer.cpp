@@ -47,14 +47,18 @@ namespace
 				{
 					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
 					for (mint i = 0; i < c_nExceptions; ++i)
-						std::make_exception_ptr(DMibErrorInstance("Test"));
+					{
+						[[maybe_unused]] auto pTest = std::make_exception_ptr(DMibErrorInstance("Test"));
+					}
 				}
 
 				for (mint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(StdTime, c_nExceptions);
 					for (mint i = 0; i < c_nExceptions; ++i)
-						std::make_exception_ptr(std::runtime_error("Test"));
+					{
+						[[maybe_unused]] auto pTest = std::make_exception_ptr(std::runtime_error("Test"));
+					}
 				}
 
 				CTestPerformance Performing(1.0);
