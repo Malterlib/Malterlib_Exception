@@ -21,9 +21,12 @@ namespace NMib::NException
 	{
 		return std::current_exception();
 	}
-#ifdef DMibDebug
-#define DMibExceptionTraceEnable
-#endif
+
+	// Tracing exceptions is not so useful any more so let's leave it disabled. If you need it uncomment this.
+	//#ifdef DMibDebug
+	//#define DMibExceptionTraceEnable
+	//#endif
+
 	class CNormalExceptionTag {};
 	class CDebugExceptionTag {};
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
