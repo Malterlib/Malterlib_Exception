@@ -271,12 +271,12 @@ namespace
 				
 				DMibTest(!DMibExpr(Result));
 
-				DMibTest(DMibExpr(fg_ThrowsException(DMibErrorInstance("Test"))) == DMibLExpr(Result.f_Get()));
-				
+				DMibExpectException(Result.f_Get(), DMibErrorInstance("Test"));
+
 				NMib::NConcurrency::TCAsyncResult<int> NewResult = Result;
 
-				DMibTest(DMibExpr(fg_ThrowsException(DMibErrorInstance("Test"))) == DMibLExpr(NewResult.f_Get()));
-				
+				DMibExpectException(NewResult.f_Get(), DMibErrorInstance("Test"));
+
 			};
 		}
 			
