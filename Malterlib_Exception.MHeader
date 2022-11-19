@@ -26,12 +26,12 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 Property
 {
-	MalterlibLibrary_Exception define bool = MalterlibLibrary_All
+	MalterlibLibrary_Exception: bool = MalterlibLibrary_All
 	MalterlibSubLibraries =+ "Exception"
 	{
 		!!MalterlibLibrary_Exception true
 	}
-//	MalterlibSubLibrarySeparate_Lib_Malterlib_Exception define bool = true
+//	MalterlibSubLibrarySeparate_Lib_Malterlib_Exception: bool = true
 	MalterlibIncludeRoots =+ "Include"->MakeAbsolute()
 	{
 		!!MalterlibLibrary_Exception true
@@ -43,8 +43,8 @@ Property
 	!!MalterlibEnableInternalTests true
 	
 	MalterlibTests =+ "Malterlib_Exception"
-	MalterlibTestFiles_Malterlib_Exception define [type(CEntity)] = ["Test/*"->MakeAbsolute()]
-	MalterlibTestDependencies_Malterlib_Exception define [type(CEntity)] = ["Lib_Malterlib_Concurrency"]
+	MalterlibTestFiles_Malterlib_Exception: [type(CEntity)] = ["Test/*"->MakeAbsolute()]
+	MalterlibTestDependencies_Malterlib_Exception: [type(CEntity)] = ["Lib_Malterlib_Concurrency"]
 }
 
 
@@ -72,7 +72,7 @@ Property
 
 Property
 {
-	MalterlibException_SupportStackTraces define bool = false // User(Debug)=true: Set to true to enable stack tracing for exceptions
+	MalterlibException_SupportStackTraces: bool = false // User(Debug)=true: Set to true to enable stack tracing for exceptions
 }
 
 Compile
