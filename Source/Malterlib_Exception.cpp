@@ -567,6 +567,89 @@ namespace NMib::NException
 	DMibImpErrorClassImplement(CExceptionExceptionVector);
 	DMibImpErrorClassImplement(CExceptionWrapped);
 	DMibImpErrorClassImplement(CExceptionCoroutineWrapper);
+
+	void CExceptionExceptionVectorData::CErrorCollector::f_AddError(CExceptionPointer &&_pException)
+	{
+		mp_Exceptions.f_Insert(fg_Move(_pException));
+	}
+
+	namespace
+	{
+		struct CErrorEntry
+		{
+			mint m_nInstances = 0;
+
+			DMibListLinkDS_Link(CErrorEntry, m_Link);
+		};
+
+		struct CCollectedErrors
+		{
+			NContainer::TCMap<NStr::CStr, CErrorEntry> m_ErrorEntries;
+			DMibListLinkDS_List(CErrorEntry, m_Link) m_OrderedErrorEntries;
+		};
+
+		void fg_FlattenExceptions(NContainer::TCVector<CExceptionPointer> &o_Exceptions, CCollectedErrors &o_Errors, NContainer::TCVector<CExceptionPointer> &&_Exceptions);
+
+		void fg_FlattenException(NContainer::TCVector<CExceptionPointer> &o_Exceptions, CCollectedErrors &o_Errors, CExceptionPointer &&_pException)
+		{
+			try
+			{
+				std::rethrow_exception(_pException);
+			}
+			catch (CExceptionExceptionVector &_Exception)
+			{
+				fg_FlattenExceptions(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_Exceptions));
+			}
+			catch (CExceptionWrapped &_WrappedException) // When a co_await returns an exception
+			{
+				fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_WrappedException.f_GetSpecific().m_pWrapped));
+			}
+			catch (CExceptionCoroutineWrapper &_WrappedException) // When a co_await returns an exception
+			{
+				fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_WrappedException.f_GetSpecific().m_pException));
+			}
+			catch (CExceptionBase const &_Exception)
+			{
+				auto &Entry = o_Errors.m_ErrorEntries[_Exception.f_GetErrorStr()];
+				if (!Entry.m_Link.f_IsInList())
+					o_Errors.m_OrderedErrorEntries.f_Insert(Entry);
+				++Entry.m_nInstances;
+
+				o_Exceptions.f_Insert(fg_Move(_pException));
+			}
+		}
+		void fg_FlattenExceptions(NContainer::TCVector<CExceptionPointer> &o_Exceptions, CCollectedErrors &o_Errors, NContainer::TCVector<CExceptionPointer> &&_Exceptions)
+		{
+			for (auto &pException : _Exceptions)
+				fg_FlattenException(o_Exceptions, o_Errors, fg_Move(pException));
+		}
+	}
+
+	CExceptionPointer CExceptionExceptionVectorData::CErrorCollector::f_GetException() &&
+	{
+		using namespace NStr;
+
+		NContainer::TCVector<CExceptionPointer> FlattenedExceptions;
+		CCollectedErrors Collected;
+
+		fg_FlattenExceptions(FlattenedExceptions, Collected, fg_Move(mp_Exceptions));
+
+		if (FlattenedExceptions.f_GetLen() == 1)
+			return fg_Move(FlattenedExceptions.f_GetFirst());
+
+		CStr ErrorStr;
+
+		for (auto &Entry : Collected.m_OrderedErrorEntries)
+		{
+			auto &Error = Collected.m_ErrorEntries.fs_GetKey(Entry);
+			if (Entry.m_nInstances >= 2)
+				fg_AddStrSep(ErrorStr, "{} - x{}"_f << Error << Entry.m_nInstances, "\n");
+			else
+				fg_AddStrSep(ErrorStr, Error, "\n");
+		}
+
+		return DMibErrorInstanceExceptionVector(fg_Move(ErrorStr), fg_Move(FlattenedExceptions), false).f_ExceptionPointer();
+	}
 }
 
 namespace NMib::NFile

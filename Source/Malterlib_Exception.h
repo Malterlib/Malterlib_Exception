@@ -355,6 +355,10 @@ namespace NMib::NException
 			{\
 				return m_SpecificData;\
 			}\
+			d_CSpecificType &f_GetSpecific() \
+			{\
+				return m_SpecificData;\
+			}\
 			~d_CClass();\
 			DMibImpErrorSpecificClass_Streaming(d_CParent)\
 			static uint32 ms_TypeHash;\

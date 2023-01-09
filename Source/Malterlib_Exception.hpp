@@ -108,6 +108,7 @@ namespace NMib::NException
 #	define DMibErrorWrapped(d_Description, d_Specific, ...) DMibImpErrorSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific, ##__VA_ARGS__)
 #	define DMibErrorInstanceWrapped(d_Description, d_Specific, ...) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific, ##__VA_ARGS__)
 
+	class CExceptionExceptionVector;
 	struct CExceptionExceptionVectorData
 	{
 		CExceptionExceptionVectorData() = default;
@@ -123,6 +124,15 @@ namespace NMib::NException
 		}
 
 		NContainer::TCVector<CExceptionPointer> m_Exceptions;
+
+		struct CErrorCollector
+		{
+			void f_AddError(CExceptionPointer &&_pException);
+			CExceptionPointer f_GetException() &&;
+
+		private:
+			NContainer::TCVector<CExceptionPointer> mp_Exceptions;
+		};
 	};
 
 	DMibImpErrorSpecificClassDefine(CExceptionExceptionVector, CException, CExceptionExceptionVectorData);
