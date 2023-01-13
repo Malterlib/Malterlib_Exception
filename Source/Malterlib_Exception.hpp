@@ -154,12 +154,12 @@ namespace NMib::NStream
 	class TCBinaryStreamTypeReference<t_CStream, NException::CExceptionPointer>
 	{
 	public:
-		static void fs_Feed(t_CStream &_Stream, NException::CExceptionPointer const &_Data)
+		static constexpr void fs_Feed(t_CStream &_Stream, NException::CExceptionPointer const &_Data)
 		{
 			NConcurrency::NPrivate::fg_FeedException(_Stream, _Data);
 		}
 
-		static void fs_Consume(t_CStream &_Stream, NException::CExceptionPointer &_Data)
+		static constexpr void fs_Consume(t_CStream &_Stream, NException::CExceptionPointer &_Data)
 		{
 			_Data = NConcurrency::NPrivate::fg_ConsumeException(_Stream);
 		}
