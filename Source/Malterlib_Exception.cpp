@@ -547,6 +547,7 @@ namespace NMib::NException
 		DMibImpErrorClass_TypeRegistry(CException);
 	}
 
+#ifdef DMibNeedDebugException
 	uint32 CDebugException::ms_TypeHash = DMibException_TypeHash(CDebugException);
 
 	CExceptionPointer CDebugException::f_ExceptionPointer() const
@@ -559,11 +560,13 @@ namespace NMib::NException
 		DMibImpErrorClass_TypeRegistry(CDebugException);
 	}
 
+	DMibImpErrorClassImplement(CExceptionSafeCheck);
+#endif
+
 	DMibImpErrorClassImplement(CExceptionMemory);
 	DMibImpErrorClassImplement(CExceptionSystemImplementation);
 	DMibImpErrorClassImplement(CExceptionPureCall);
 	DMibImpErrorClassImplement(CExceptionBadFunctionCall);
-	DMibImpErrorClassImplement(CExceptionSafeCheck);
 	DMibImpErrorClassImplement(CExceptionExceptionVector);
 	DMibImpErrorClassImplement(CExceptionWrapped);
 	DMibImpErrorClassImplement(CExceptionCoroutineWrapper);

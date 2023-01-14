@@ -183,6 +183,7 @@ namespace NMib::NException
 		void fp_RegisterTypeRegistry() const;
 	};
 
+#ifdef DMibNeedDebugException
 	class CDebugException : public CExceptionBase
 	{
 	public:
@@ -225,6 +226,7 @@ namespace NMib::NException
 	private:
 		void fp_RegisterTypeRegistry() const;
 	};
+#endif
 
 	bool fg_SetEnableExceptionTrace(bool _bEnabled);
 	bool fg_SetGlobalEnableExceptionTrace(bool _bEnabled);
