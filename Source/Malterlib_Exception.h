@@ -418,12 +418,17 @@ namespace NMib::NException
 	|	Class:				Safe check exception									|
 	\*_____________________________________________________________________________*/
 
+#if DMibEnableSafeCheck > 0
 	DMibImpErrorClassDefine(CExceptionSafeCheck, CDebugException);
 #		define DMibErrorSafeCheck(_Description) DMibImpError(NMib::NException::CExceptionSafeCheck, _Description)
+#		define DMibErrorInstanceSafeCheck(_Description) DMibImpExceptionInstance(NMib::NException::CExceptionSafeCheck, _Description)
+
 
 #		ifndef DMibPNoShortCuts
 #			define DErrorSafeCheck(_Description) DMibErrorSafeCheck(_Description)
+#			define DErrorInstanceSafeCheck(_Description) DMibErrorInstanceSafeCheck(_Description)
 #		endif
+#endif
 
 	struct CExceptionCoroutineData
 	{
