@@ -61,7 +61,7 @@ namespace NMib::NException
 		{
 			std::rethrow_exception(_pExceptionPointer);
 		}
-		catch (NException::CException const &_Exception)
+		catch (CException const &_Exception)
 		{
 			return _Exception.f_GetErrorStr();
 		}
@@ -74,7 +74,7 @@ namespace NMib::NException
 		{
 			std::rethrow_exception(fg_CurrentException());
 		}
-		catch (NException::CException const &_Exception)
+		catch (CException const &_Exception)
 		{
 			return _Exception.f_GetErrorStr();
 		}
@@ -566,6 +566,7 @@ namespace NMib::NException
 	DMibImpErrorClassImplement(CExceptionSafeCheck);
 	DMibImpErrorClassImplement(CExceptionExceptionVector);
 	DMibImpErrorClassImplement(CExceptionWrapped);
+	DMibImpErrorClassImplement(CExceptionCoroutineWrapper);
 }
 
 namespace NMib::NFile
