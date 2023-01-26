@@ -539,7 +539,7 @@ namespace NMib::NException
 
 	CExceptionPointer CException::f_ExceptionPointer() const
 	{
-		return std::make_exception_ptr(*this);
+		return fg_MakeException(*this);
 	}
 
 	void CException::fp_RegisterTypeRegistry() const
@@ -552,7 +552,7 @@ namespace NMib::NException
 
 	CExceptionPointer CDebugException::f_ExceptionPointer() const
 	{
-		return std::make_exception_ptr(*this);
+		return fg_MakeException(*this);
 	}
 
 	void CDebugException::fp_RegisterTypeRegistry() const
@@ -562,6 +562,9 @@ namespace NMib::NException
 
 	DMibImpErrorClassImplement(CExceptionSafeCheck);
 #endif
+
+	template CExceptionPointer fg_ExceptionPointer<CException const &>(CException const &_Exception);
+	template CExceptionPointer fg_ExceptionPointer<CException &&>(CException &&_Exception);
 
 	DMibImpErrorClassImplement(CExceptionMemory);
 	DMibImpErrorClassImplement(CExceptionSystemImplementation);
@@ -595,25 +598,43 @@ namespace NMib::NException
 
 		void fg_FlattenException(NContainer::TCVector<CExceptionPointer> &o_Exceptions, CCollectedErrors &o_Errors, CExceptionPointer &&_pException)
 		{
-			try
+			bool bHandled = NException::fg_VisitException
+				<
+					CExceptionExceptionVector
+					, CExceptionWrapped
+					, CExceptionCoroutineWrapper
+					, CExceptionBase
+				>
+				(
+					_pException
+					, [&]<typename tf_CException>(tf_CException &&_Exception)
+					{
+						using CExceptionType = typename NTraits::TCRemoveReferenceAndQualifiers<tf_CException>::CType;
+						
+						if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionExceptionVector>::mc_Value)
+							fg_FlattenExceptions(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_Exceptions));
+						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionWrapped>::mc_Value)
+							fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_pWrapped));
+						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionCoroutineWrapper>::mc_Value)
+							fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_pException));
+						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionBase>::mc_Value)
+						{
+							auto &Entry = o_Errors.m_ErrorEntries[_Exception.f_GetErrorStr()];
+							if (!Entry.m_Link.f_IsInList())
+								o_Errors.m_OrderedErrorEntries.f_Insert(Entry);
+							++Entry.m_nInstances;
+
+							o_Exceptions.f_Insert(fg_Move(_pException));
+						}
+						else
+							DMibFastCheck(false);
+					}
+				)
+			;
+
+			if (!bHandled)
 			{
-				std::rethrow_exception(_pException);
-			}
-			catch (CExceptionExceptionVector &_Exception)
-			{
-				fg_FlattenExceptions(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_Exceptions));
-			}
-			catch (CExceptionWrapped &_WrappedException) // When a co_await returns an exception
-			{
-				fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_WrappedException.f_GetSpecific().m_pWrapped));
-			}
-			catch (CExceptionCoroutineWrapper &_WrappedException) // When a co_await returns an exception
-			{
-				fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_WrappedException.f_GetSpecific().m_pException));
-			}
-			catch (CExceptionBase const &_Exception)
-			{
-				auto &Entry = o_Errors.m_ErrorEntries[_Exception.f_GetErrorStr()];
+				auto &Entry = o_Errors.m_ErrorEntries[NStr::gc_Str<"Unknown exception">.m_Str];
 				if (!Entry.m_Link.f_IsInList())
 					o_Errors.m_OrderedErrorEntries.f_Insert(Entry);
 				++Entry.m_nInstances;
@@ -621,6 +642,7 @@ namespace NMib::NException
 				o_Exceptions.f_Insert(fg_Move(_pException));
 			}
 		}
+
 		void fg_FlattenExceptions(NContainer::TCVector<CExceptionPointer> &o_Exceptions, CCollectedErrors &o_Errors, NContainer::TCVector<CExceptionPointer> &&_Exceptions)
 		{
 			for (auto &pException : _Exceptions)

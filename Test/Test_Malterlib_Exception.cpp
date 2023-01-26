@@ -8,6 +8,7 @@
 
 #include <Mib/Concurrency/AsyncResult>
 #include <Mib/Test/Exception>
+#include <Mib/Test/Performance>
 
 namespace NMib::NException
 {
@@ -83,10 +84,11 @@ namespace NMib::NException
 
 namespace
 {
+	using namespace NMib::NConcurrency;
+
 	class CExceptions_Tests : public NMib::NTest::CTest
 	{
 	public:
-
 		void f_DoTests()
 		{
 			//  << CTestGroup("Unfinished")
@@ -258,7 +260,7 @@ namespace
 			};
 			DMibTestSuite("General")
 			{
-				NMib::NConcurrency::TCAsyncResult<int> Result;
+				TCAsyncResult<int> Result;
 				try
 				{
 					DMibError("Test");
@@ -268,18 +270,46 @@ namespace
 				{
 					Result.f_SetCurrentException();
 				}
-				
+
 				DMibTest(!DMibExpr(Result));
 
 				DMibExpectException(Result.f_Get(), DMibErrorInstance("Test"));
 
-				NMib::NConcurrency::TCAsyncResult<int> NewResult = Result;
+				TCAsyncResult<int> NewResult = Result;
 
 				DMibExpectException(NewResult.f_Get(), DMibErrorInstance("Test"));
 
 			};
+			DMibTestSuite(CTestCategory("GetExceptionString") << CTestGroup("Performance"))
+			{
+				CTestPerformance PerfTotal(0.75, false);
+				mint nIterations = 11;
+#ifdef DMibDebug
+				mint nTests = 10000;
+#else
+				mint nTests = 100000;
+#endif
+				CAsyncResult Result;
+				Result.f_SetException(fg_ExceptionPointer(DMibErrorInstance("Test error")));
+				{
+					CTestPerformanceMeasure Measure("Malterlib");
+					for (mint i = 0; i < nIterations; ++i)
+					{
+						Measure.f_Start();
+						[&]() inline_never
+							{
+								for (mint i = 0; i < nTests; ++i)
+									Result.f_GetExceptionStr();
+							}
+							()
+						;
+						Measure.f_Stop(nTests);
+					}
+					PerfTotal.f_Add(Measure);
+				}
+				DMibExpectTrue(PerfTotal);
+			};
 		}
-			
 	};
 
 	DMibTestRegister(CExceptions_Tests, Malterlib::Exception);

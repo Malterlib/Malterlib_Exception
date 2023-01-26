@@ -15,32 +15,56 @@ namespace
 	using namespace NMib::NException;
 	using namespace NMib::NTest;
 
+	template <typename tf_FOnValid>
+	bool fg_VisitExceptionDirect(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid)
+	{
+		CDisableExceptionFilterScope Scope;
+		try
+		{
+			std::rethrow_exception(_pException);
+		}
+		catch (NException::CExceptionMemory &_Exception)
+		{
+			_fOnValid(fg_Move(_Exception));
+			return true;
+		}
+		catch (NException::CException &_Exception)
+		{
+			_fOnValid(fg_Move(_Exception));
+			return true;
+		}
+		catch (...)
+		{
+		}
+
+		return false;
+	}
+
 	class CExceptionPointer_Tests : public CTest
 	{
 	public:
 		void f_DoTests()
 		{
-			DMibTestSuite(CTestCategory("Performance") << CTestGroup("Performance"))
+			DMibTestSuite(CTestCategory("MakeException") << CTestGroup("Performance"))
 			{
 				constexpr mint c_nTests = 5;
+#ifdef DMibDebug
+				constexpr mint c_nExceptions = 10000;
+#else
 				constexpr mint c_nExceptions = 100000;
+#endif
 
-				CTestPerformanceMeasure RawMalterlibTime("RawMalterlib");
-				CTestPerformanceMeasure RawStdTime("RawStd");
+				CTestPerformanceMeasure SharedPtrTime("SharedPtr");
 				CTestPerformanceMeasure MalterlibTime("Malterlib");
 				CTestPerformanceMeasure StdTime("Std");
-				for (mint i = 0; i < c_nTests; ++i)
-				{
-					DMibTestScopeMeasure(RawMalterlibTime, c_nExceptions);
-					for (mint i = 0; i < c_nExceptions; ++i)
-						TCSharedPointer<CException> pException = fg_Construct("CException", DMibPFile, DMibPLine, DMibPFunction, "Test", false);
-				}
 
 				for (mint i = 0; i < c_nTests; ++i)
 				{
-					DMibTestScopeMeasure(RawStdTime, c_nExceptions);
+					DMibTestScopeMeasure(SharedPtrTime, c_nExceptions);
 					for (mint i = 0; i < c_nExceptions; ++i)
-						TCSharedPointer<std::exception> pException = fg_Construct<std::runtime_error>("Test");
+					{
+						[[maybe_unused]] TCSharedPointer<CException> pException = fg_Construct("CException", DMibPFile, DMibPLine, DMibPFunction, "Test", false);
+					}
 				}
 
 				for (mint i = 0; i < c_nTests; ++i)
@@ -48,7 +72,7 @@ namespace
 					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
 					for (mint i = 0; i < c_nExceptions; ++i)
 					{
-						[[maybe_unused]] auto pTest = std::make_exception_ptr(DMibErrorInstance("Test"));
+						[[maybe_unused]] auto pTest = fg_MakeException(DMibErrorInstance("Test"));
 					}
 				}
 
@@ -57,14 +81,66 @@ namespace
 					DMibTestScopeMeasure(StdTime, c_nExceptions);
 					for (mint i = 0; i < c_nExceptions; ++i)
 					{
-						[[maybe_unused]] auto pTest = std::make_exception_ptr(std::runtime_error("Test"));
+						[[maybe_unused]] auto pTest = std::make_exception_ptr(DMibErrorInstance("Test"));
 					}
 				}
 
 				CTestPerformance Performing(1.0);
-				Performing.f_AddBaseline(RawMalterlibTime);
-				Performing.f_AddBaseline(RawStdTime);
+				Performing.f_AddBaseline(SharedPtrTime);
 				Performing.f_AddReference(StdTime);
+				Performing.f_Add(MalterlibTime);
+				DMibTest(DMibExpr(Performing));
+			};
+			DMibTestSuite(CTestCategory("VisitException") << CTestGroup("Performance"))
+			{
+				constexpr mint c_nTests = 5;
+#ifdef DMibDebug
+				constexpr mint c_nExceptions = 10000;
+#else
+				constexpr mint c_nExceptions = 100000;
+#endif
+
+#		define DMibErrorInstanceMemory(_Description) DMibImpExceptionInstance(NMib::NException::CExceptionMemory, _Description)
+
+				auto pException = fg_MakeException(DMibErrorInstanceMemory("Test exception"));
+
+				CTestPerformanceMeasure DirectTime("Direct");
+				CTestPerformanceMeasure MalterlibTime("Malterlib");
+
+				for (mint i = 0; i < c_nTests; ++i)
+				{
+					DMibTestScopeMeasure(DirectTime, c_nExceptions);
+					for (mint i = 0; i < c_nExceptions; ++i)
+					{
+						fg_VisitExceptionDirect
+							(
+								pException
+								, [&](auto &&_Exception)
+								{
+								}
+							)
+						;
+					}
+				}
+
+				for (mint i = 0; i < c_nTests; ++i)
+				{
+					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
+					for (mint i = 0; i < c_nExceptions; ++i)
+					{
+						fg_VisitException<NException::CExceptionPureCall, NException::CExceptionMemory, NException::CException>
+							(
+								pException
+								, [&](auto &&_Exception)
+								{
+								}
+							)
+						;
+					}
+				}
+
+				CTestPerformance Performing(1.0);
+				Performing.f_AddReference(DirectTime);
 				Performing.f_Add(MalterlibTime);
 				DMibTest(DMibExpr(Performing));
 			};

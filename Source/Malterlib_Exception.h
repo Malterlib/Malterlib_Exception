@@ -8,9 +8,13 @@
 #include <exception>
 #include <Mib/Core/Core>
 
+#include "Malterlib_Exception_FastExceptions.h"
+
 namespace NMib::NException
 {
 	using CExceptionPointer = std::exception_ptr;
+	
+	class CDisableExceptionFilterScope;
 
 	inline_always int fg_UncaughtExceptions()
 	{
@@ -129,7 +133,7 @@ namespace NMib::NException
 	template <typename tf_CException, TCEnableIfType<!NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
 	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
 	{
-		return std::make_exception_ptr(fg_Forward<tf_CException>(_Exception));
+		return fg_MakeException(fg_Forward<tf_CException>(_Exception));
 	}
 
 #		ifdef DMibRuntimeTypeRegistry
@@ -182,6 +186,9 @@ namespace NMib::NException
 	private:
 		void fp_RegisterTypeRegistry() const;
 	};
+
+	extern template CExceptionPointer fg_ExceptionPointer<CException const &>(CException const &_Exception);
+	extern template CExceptionPointer fg_ExceptionPointer<CException &&>(CException &&_Exception);
 
 #ifdef DMibNeedDebugException
 	class CDebugException : public CExceptionBase
@@ -314,7 +321,7 @@ namespace NMib::NException
 			d_CClass::~ d_CClass() = default;\
 			NMib::NException::CExceptionPointer d_CClass::f_ExceptionPointer() const\
 			{\
-				return std::make_exception_ptr(*this);\
+				return NMib::NException::fg_MakeException(*this);\
 			}\
 			void d_CClass::fp_RegisterTypeRegistry() const\
 			{\
@@ -326,7 +333,7 @@ namespace NMib::NException
             d_Namespace::d_CClass::~ d_CClass() = default;\
             NMib::NException::CExceptionPointer d_Namespace::d_CClass::f_ExceptionPointer() const\
             {\
-                return std::make_exception_ptr(*this);\
+                return NMib::NException::fg_MakeException(*this);\
             }\
             void d_Namespace::d_CClass::fp_RegisterTypeRegistry() const\
             {\
