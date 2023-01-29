@@ -5,7 +5,12 @@
 
 #define DMibIncluded_Exception
 
-#include <exception>
+#ifdef DMalterlibUseStaticLibCxx
+#	include <__exception/exception.h>
+#else
+#	include <exception>
+#endif
+
 #include <Mib/Core/Core>
 
 #include "Malterlib_Exception_FastExceptions.h"
