@@ -356,15 +356,15 @@ namespace NMib::NException
 				{
 					NSys::fg_DebugOutput
 						(
-						 	(
-							 	NStr::CStrNonTracked::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n")
-							 	<< ""
-							 	<< _Indent
-							 	<< pInfo->m_pSourceFileName
-							 	<< pInfo->m_SourceLine
-							 	<< FunctionName
+							(
+								NStr::CStrNonTracked::CFormat("{sf ,sj*}" DMibPFileLineFormat " {}\n")
+								<< ""
+								<< _Indent
+								<< pInfo->m_pSourceFileName
+								<< pInfo->m_SourceLine
+								<< FunctionName
 							)
-						 	.f_GetStr().f_GetStr()
+							.f_GetStr().f_GetStr()
 						)
 					;
 				}
