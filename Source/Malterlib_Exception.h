@@ -250,8 +250,8 @@ namespace NMib::NException
 	{
 		inline CDisableExceptionTraceScope();
 		inline ~CDisableExceptionTraceScope();
-		void f_Suspend() override;
-		void f_Resume() override;
+		void f_Suspend() noexcept override;
+		void f_ResumeNoExcept() noexcept override;
 
 	private:
 		bool mp_bOldEnable;

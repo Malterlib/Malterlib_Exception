@@ -529,12 +529,12 @@ namespace NMib::NException
 	}
 
 #ifdef DMibExceptionTraceEnable
-	void CDisableExceptionTraceScope::f_Suspend()
+	void CDisableExceptionTraceScope::f_Suspend() noexcept
 	{
 		fg_SetEnableExceptionTrace(mp_bOldEnable);
 	}
 
-	void CDisableExceptionTraceScope::f_Resume()
+	void CDisableExceptionTraceScope::f_ResumeNoExcept() noexcept
 	{
 		mp_bOldEnable = fg_SetEnableExceptionTrace(false);
 	}
