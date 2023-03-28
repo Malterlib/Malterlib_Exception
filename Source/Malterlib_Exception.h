@@ -113,6 +113,8 @@ namespace NMib::NException
 
 		virtual CExceptionPointer f_ExceptionPointer() const = 0;
 
+		operator NException::CExceptionPointer () const;
+
 #ifdef DMibRuntimeTypeRegistry
 		template <typename tf_CStream>
 		void f_Feed(tf_CStream &_Stream) const;

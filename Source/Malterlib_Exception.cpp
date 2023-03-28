@@ -461,6 +461,11 @@ namespace NMib::NException
 			return m_ErrorNoAlloc;
 	}
 
+	CExceptionBase::operator NException::CExceptionPointer () const
+	{
+		return f_ExceptionPointer();
+	}
+
 	NStr::CStr CExceptionBase::f_GetErrorStr() const
 	{
 		if (m_pErrorAlloc)
