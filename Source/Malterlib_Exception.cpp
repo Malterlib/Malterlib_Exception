@@ -577,7 +577,6 @@ namespace NMib::NException
 	DMibImpErrorClassImplement(CExceptionBadFunctionCall);
 	DMibImpErrorClassImplement(CExceptionExceptionVector);
 	DMibImpErrorClassImplement(CExceptionWrapped);
-	DMibImpErrorClassImplement(CExceptionCoroutineWrapper);
 
 	void CExceptionExceptionVectorData::CErrorCollector::f_AddError(CExceptionPointer &&_pException)
 	{
@@ -607,7 +606,6 @@ namespace NMib::NException
 				<
 					CExceptionExceptionVector
 					, CExceptionWrapped
-					, CExceptionCoroutineWrapper
 					, CExceptionBase
 				>
 				(
@@ -620,8 +618,6 @@ namespace NMib::NException
 							fg_FlattenExceptions(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_Exceptions));
 						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionWrapped>::mc_Value)
 							fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_pWrapped));
-						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionCoroutineWrapper>::mc_Value)
-							fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_pException));
 						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionBase>::mc_Value)
 						{
 							auto &Entry = o_Errors.m_ErrorEntries[_Exception.f_GetErrorStr()];

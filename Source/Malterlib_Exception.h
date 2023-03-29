@@ -443,28 +443,6 @@ namespace NMib::NException
 #			define DErrorInstanceSafeCheck(_Description) DMibErrorInstanceSafeCheck(_Description)
 #		endif
 #endif
-
-	struct CExceptionCoroutineData
-	{
-		CExceptionCoroutineData() = default;
-		CExceptionCoroutineData(NException::CExceptionPointer &&_pException)
-			: m_pException(fg_Move(_pException))
-		{
-		}
-
-		template <typename tf_CStream>
-		void f_Stream(tf_CStream &_Stream)
-		{
-			DMibPDebugBreak; // Not valid for streaming
-		}
-
-		NException::CExceptionPointer m_pException;
-	};
-
-	DMibImpErrorSpecificClassDefine(CExceptionCoroutineWrapper, NMib::NException::CExceptionBase, CExceptionCoroutineData);
-#	define DMibErrorCoroutineWrapper(d_Description, d_Specific) DMibImpErrorSpecific(NMib::NException::CExceptionCoroutineWrapper, d_Description, d_Specific, false)
-#	define DMibErrorInstanceCoroutineWrapper(d_Description, d_Specific) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionCoroutineWrapper, d_Description, d_Specific, false)
-
 }
 
 namespace NMib::NFile
