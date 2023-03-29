@@ -57,28 +57,28 @@ namespace NMib::NException
 
 	NStr::CStr fg_ExceptionString(CExceptionPointer const &_pExceptionPointer)
 	{
-		try
+		NStr::CStr Return;
+		if
+			(
+				!NException::fg_VisitException<NException::CExceptionBase>
+				(
+					_pExceptionPointer
+					, [&](NException::CExceptionBase const& _Exception)
+					{
+						Return = _Exception.f_GetErrorStr();
+					}
+				)
+			)
 		{
-			std::rethrow_exception(_pExceptionPointer);
+			return NStr::gc_Str<"Unknown exception type">;
 		}
-		catch (CException const &_Exception)
-		{
-			return _Exception.f_GetErrorStr();
-		}
-		return "";
+
+		return Return;
 	}
 
 	NStr::CStr fg_CurrentExceptionString()
 	{
-		try
-		{
-			std::rethrow_exception(fg_CurrentException());
-		}
-		catch (CException const &_Exception)
-		{
-			return _Exception.f_GetErrorStr();
-		}
-		return "";
+		return fg_ExceptionString(fg_CurrentException());
 	}
 
 	bool CExceptionBase::operator == (CExceptionBase const &_Other) const
