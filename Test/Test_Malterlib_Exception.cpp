@@ -95,7 +95,7 @@ namespace
 			DMibTestCategoryFlags(CTestCategory("Exception lambdas"), ETestCategoryFlag_DisableExceptionFilter | ETestCategoryFlag_Tests)
 			{
 				{
-					volatile int bThrowExcption = false;
+					volatile int bThrowException = false;
 					bool bExceptionCaught = false;
 
 					NMib::NTime::CCyclesMin ExceptionsLambdaTime;
@@ -110,7 +110,7 @@ namespace
 							(
 								[&] ()
 								{
-									if (bThrowExcption)
+									if (bThrowException)
 										throw int(30);
 								}
 							)
@@ -141,7 +141,7 @@ namespace
 						{
 							try
 							{
-								if (bThrowExcption)
+								if (bThrowException)
 									throw int(30);
 							}
 							catch (int)
@@ -161,7 +161,7 @@ namespace
 						NoExceptionsTime.f_Start();
 						for (mint i = 0; i < 10000; ++i)
 						{
-							if (bThrowExcption)
+							if (bThrowException)
 								throw int(30);
 						}
 						NoExceptionsTime.f_Stop();

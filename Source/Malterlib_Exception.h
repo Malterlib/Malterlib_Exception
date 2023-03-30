@@ -124,7 +124,7 @@ namespace NMib::NException
 	};
 
 	template <typename t_CException>
-	struct TCIsExcption : public NTraits::TCCompileTimeConstant<bool, NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<t_CException>::CType, CExceptionBase>::mc_Value>
+	struct TCIsException : public NTraits::TCCompileTimeConstant<bool, NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<t_CException>::CType, CExceptionBase>::mc_Value>
 	{
 	};
 
