@@ -290,7 +290,7 @@ namespace
 				mint nTests = 100000;
 #endif
 				CAsyncResult Result;
-				Result.f_SetException(fg_ExceptionPointer(DMibErrorInstance("Test error")));
+				Result.f_SetException(fg_MakeException(DMibErrorInstance("Test error")));
 				{
 					CTestPerformanceMeasure Measure("Malterlib");
 					for (mint i = 0; i < nIterations; ++i)
