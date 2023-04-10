@@ -605,7 +605,6 @@ namespace NMib::NException
 			bool bHandled = NException::fg_VisitException
 				<
 					CExceptionExceptionVector
-					, CExceptionWrapped
 					, CExceptionBase
 				>
 				(
@@ -616,8 +615,6 @@ namespace NMib::NException
 						
 						if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionExceptionVector>::mc_Value)
 							fg_FlattenExceptions(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_Exceptions));
-						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionWrapped>::mc_Value)
-							fg_FlattenException(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_pWrapped));
 						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionBase>::mc_Value)
 						{
 							auto &Entry = o_Errors.m_ErrorEntries[_Exception.f_GetErrorStr()];
