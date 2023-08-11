@@ -336,7 +336,7 @@ namespace NMib::NException
 		if (!bFoundFunction)
 			return _pFunction;
 		else if (!FunctionName.f_IsEmpty() && !ClassName.f_IsEmpty())
-			return NStr::fg_Format("{}::{}()", ClassName, FunctionName);
+			return NStr::fg_Format<NStr::CStrNonTracked>("{}::{}()", ClassName, FunctionName);
 		else if (FunctionName.f_IsEmpty())
 			return ClassName + "{}";
 
