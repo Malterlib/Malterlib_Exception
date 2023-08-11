@@ -362,7 +362,7 @@ namespace NMib::NException
 								<< _Indent
 								<< pInfo->m_pSourceFileName
 								<< pInfo->m_SourceLine
-								<< FunctionName
+								<< FunctionName.f_ReplaceChar('\'', '$')
 							)
 							.f_GetStr().f_GetStr()
 						)
