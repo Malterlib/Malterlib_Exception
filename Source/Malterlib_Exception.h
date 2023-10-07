@@ -7,6 +7,7 @@
 
 #ifdef DMalterlibUseStaticLibCxx
 #	include <__exception/exception.h>
+#	include <__exception/exception_ptr.h>
 #else
 #	include <exception>
 #endif
