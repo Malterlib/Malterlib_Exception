@@ -3,12 +3,14 @@
 
 #pragma once
 
+#ifdef DMibHasFastExceptions
 extern "C"
 {
 	void *__cxa_allocate_exception(size_t thrown_size) throw();
 	void __cxa_make_exception_ptr(void *thrown_object, std::type_info const *tinfo, void (*dest)(void *));
 	bool __cxa_can_catch(void *thrown_object, std::type_info const *tinfo);
 }
+#endif
 
 namespace NMib::NException
 {
