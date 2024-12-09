@@ -70,7 +70,20 @@ namespace NMib::NException
 				)
 			)
 		{
-			return NStr::gc_Str<"Unknown exception type">;
+			if
+				(
+					!NException::fg_VisitException<std::exception>
+					(
+						_pExceptionPointer
+						, [&](std::exception const &_Exception)
+						{
+							Return = _Exception.what();
+						}
+					)
+				)
+			{
+				return NStr::gc_Str<"Unknown exception type">;
+			}
 		}
 
 		return Return;
