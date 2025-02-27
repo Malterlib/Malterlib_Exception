@@ -596,6 +596,11 @@ namespace NMib::NException
 		mp_Exceptions.f_Insert(fg_Move(_pException));
 	}
 
+	bool CExceptionExceptionVectorData::CErrorCollector::f_HasError() const
+	{
+		return !mp_Exceptions.f_IsEmpty();
+	}
+
 	namespace
 	{
 		struct CErrorEntry

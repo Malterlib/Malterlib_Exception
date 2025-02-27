@@ -129,6 +129,7 @@ namespace NMib::NException
 		{
 			void f_AddError(CExceptionPointer &&_pException);
 			CExceptionPointer f_GetException() &&;
+			bool f_HasError() const;
 
 		private:
 			NContainer::TCVector<CExceptionPointer> mp_Exceptions;
