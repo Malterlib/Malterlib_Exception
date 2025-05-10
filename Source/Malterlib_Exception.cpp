@@ -155,7 +155,7 @@ namespace NMib::NException
 		if (_bStackTrace)
 		{
 			m_pCallstack = fg_Construct();
-			m_pCallstack->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstack->m_Callstack, 128);
+			m_pCallstack->f_Capture();
 		}
 #endif
 		if (NStr::fg_StrLen(_pError) > 127)
@@ -176,7 +176,7 @@ namespace NMib::NException
 		if (_bStackTrace)
 		{
 			m_pCallstackNonTracked = fg_Construct();
-			m_pCallstackNonTracked->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstackNonTracked->m_Callstack, 128);
+			m_pCallstackNonTracked->f_Capture();
 		}
 #endif
 		if (NStr::fg_StrLen(_pError) > 127)
@@ -205,7 +205,7 @@ namespace NMib::NException
 		if (_bStackTrace)
 		{
 			m_pCallstack = fg_Construct();
-			m_pCallstack->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstack->m_Callstack, 128);
+			m_pCallstack->f_Capture();
 		}
 #endif
 #ifdef DMibExceptionTraceEnable
@@ -227,7 +227,7 @@ namespace NMib::NException
 		if (_bStackTrace)
 		{
 			m_pCallstackNonTracked = fg_Construct();
-			m_pCallstackNonTracked->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstackNonTracked->m_Callstack, 128);
+			m_pCallstackNonTracked->f_Capture();
 		}
 #endif
 #ifdef DMibExceptionTraceEnable
@@ -248,6 +248,11 @@ namespace NMib::NException
 		NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
 
 		return FunctionName;
+	}
+
+	void CCallstack::f_Capture()
+	{
+		m_CallstackLen = NSys::fg_System_GetStackTrace(m_Callstack, mc_StackSize);
 	}
 
 	NStr::CStrNonTracked CCallstack::fs_ShortenFunctionName(ch8 const *_pFunction)
@@ -438,7 +443,7 @@ namespace NMib::NException
 		if (_bStackTrace)
 		{
 			m_pCallstack = fg_Construct();
-			m_pCallstack->m_CallstackLen = NSys::fg_System_GetStackTrace(m_pCallstack->m_Callstack, 128);
+			m_pCallstack->f_Capture();
 		}
 #endif
 		if (NStr::fg_StrLen(_pError) > 127)

@@ -50,8 +50,11 @@ namespace NMib::NException
 		NStr::CStr f_GetString(mint _Indent) const;
 		NStr::CStr f_GetFunctionName(mint _iCallstack) const;
 		static NStr::CStrNonTracked fs_ShortenFunctionName(ch8 const *_pFunction);
+		void f_Capture();
 
-		CMibCodeAddress m_Callstack[128];
+		constexpr static mint mc_StackSize = 128;
+
+		CMibCodeAddress m_Callstack[mc_StackSize];
 		mint m_CallstackLen = 0;
 	};
 
