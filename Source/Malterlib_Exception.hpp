@@ -24,7 +24,7 @@ namespace NMib::NException
 		, m_Line(_Line)
 		, m_TypeHash(_TypeHash)
 	{
-		if constexpr (NTraits::TCIsSame<typename t_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator>::mc_Value || !NStr::TCStr<t_CError>::mc_AllocatesMemory)
+		if constexpr (NTraits::cIsSame<typename t_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator> || !NStr::TCStr<t_CError>::mc_AllocatesMemory)
 			fp_ConstructNonTracked(_Error.f_GetStr(), _bTrace, _bStackTrace);
 		else
 			fp_Construct(_Error.f_GetStr(), _bTrace, _bStackTrace);
@@ -39,7 +39,7 @@ namespace NMib::NException
 		, m_Line(_Line)
 		, m_TypeHash(_TypeHash)
 	{
-		if constexpr (NTraits::TCIsSame<typename t_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator>::mc_Value || !NStr::TCStr<t_CError>::mc_AllocatesMemory)
+		if constexpr (NTraits::cIsSame<typename t_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator> || !NStr::TCStr<t_CError>::mc_AllocatesMemory)
 			fp_ConstructNonTracked(_Error.f_GetStr(), _bTrace, _bStackTrace);
 		else
 			fp_Construct(_Error.f_GetStr(), _bTrace, _bStackTrace);

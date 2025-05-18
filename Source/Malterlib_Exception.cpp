@@ -634,11 +634,11 @@ namespace NMib::NException
 					_pException
 					, [&]<typename tf_CException>(tf_CException &&_Exception)
 					{
-						using CExceptionType = typename NTraits::TCRemoveReferenceAndQualifiers<tf_CException>::CType;
+						using CExceptionType = NTraits::TCRemoveReferenceAndQualifiers<tf_CException>;
 						
-						if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionExceptionVector>::mc_Value)
+						if constexpr (NTraits::cIsSame<CExceptionType, CExceptionExceptionVector>)
 							fg_FlattenExceptions(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_Exceptions));
-						else if constexpr (NTraits::TCIsSame<CExceptionType, CExceptionBase>::mc_Value)
+						else if constexpr (NTraits::cIsSame<CExceptionType, CExceptionBase>)
 						{
 							auto &Entry = o_Errors.m_ErrorEntries[_Exception.f_GetErrorStr()];
 							if (!Entry.m_Link.f_IsInList())

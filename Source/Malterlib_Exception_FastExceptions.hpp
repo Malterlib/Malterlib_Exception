@@ -18,7 +18,7 @@ namespace NMib::NException
 	template <typename tf_CException>
 	CExceptionPointer fg_MakeException(tf_CException &&_Exception) noexcept
 	{
-		using CException = typename NTraits::TCRemoveReferenceAndQualifiers<tf_CException>::CType;
+		using CException = NTraits::TCRemoveReferenceAndQualifiers<tf_CException>;
 
 		auto *pExceptionMemory = __cxa_allocate_exception(sizeof(CException));
 
@@ -109,7 +109,7 @@ namespace NMib::NException
 		CDisableExceptionFilterScope DisableExceptionFilter;
 		try
 		{
-			return NPrivate::fg_VisitExceptionHelper(_pException, _fOnValid, typename NMeta::TCReverseTemplateArguments<NMeta::TCTypeList<tfp_CExceptions...>>::CType());
+			return NPrivate::fg_VisitExceptionHelper(_pException, _fOnValid, NMeta::TCReverseTemplateArguments<NMeta::TCTypeList<tfp_CExceptions...>>());
 		}
 		catch (...)
 		{

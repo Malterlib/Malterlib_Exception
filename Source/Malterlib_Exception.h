@@ -128,11 +128,9 @@ namespace NMib::NException
 	};
 
 	template <typename t_CException>
-	struct TCIsException : public NTraits::TCCompileTimeConstant<bool, NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<t_CException>::CType, CExceptionBase>::mc_Value>
-	{
-	};
+	concept cIsException = NTraits::cIsBaseOf<NTraits::TCRemoveReference<t_CException>, CExceptionBase>;
 
-	template <typename tf_CException, TCEnableIfType<NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
+	template <typename tf_CException, TCEnableIf<NTraits::cIsBaseOf<NTraits::TCRemoveReference<tf_CException>, CExceptionBase>> * = nullptr>
 	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
 	{
 		return _Exception.f_ExceptionPointer();
@@ -141,7 +139,7 @@ namespace NMib::NException
 	NStr::CStr fg_ExceptionString(CExceptionPointer const &_pExceptionPointer);
 	NStr::CStr fg_CurrentExceptionString();
 
-	template <typename tf_CException, TCEnableIfType<!NTraits::TCIsBaseOf<typename NTraits::TCRemoveReference<tf_CException>::CType, CExceptionBase>::mc_Value> * = nullptr>
+	template <typename tf_CException, TCEnableIf<!NTraits::cIsBaseOf<NTraits::TCRemoveReference<tf_CException>, CExceptionBase>> * = nullptr>
 	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
 	{
 		return fg_MakeException(fg_Forward<tf_CException>(_Exception));
