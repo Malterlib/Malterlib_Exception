@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include <Mib/Core/Core>
@@ -244,7 +244,7 @@ namespace NMib::NException
 		if (!pInfo || !pInfo->m_pFunctionName)
 			return {};
 		NStr::CStr FunctionName = pInfo->m_pFunctionName;
-		
+
 		NSys::fg_Debug_ReleaseStackTraceInfo(pInfo);
 
 		return FunctionName;
@@ -635,7 +635,7 @@ namespace NMib::NException
 					, [&]<typename tf_CException>(tf_CException &&_Exception)
 					{
 						using CExceptionType = NTraits::TCRemoveReferenceAndQualifiers<tf_CException>;
-						
+
 						if constexpr (NTraits::cIsSame<CExceptionType, CExceptionExceptionVector>)
 							fg_FlattenExceptions(o_Exceptions, o_Errors, fg_Move(_Exception.f_GetSpecific().m_Exceptions));
 						else if constexpr (NTraits::cIsSame<CExceptionType, CExceptionBase>)

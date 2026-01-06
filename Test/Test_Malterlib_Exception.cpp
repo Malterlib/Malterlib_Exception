@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #ifdef DCompiler_MSVC
@@ -166,7 +166,7 @@ namespace
 						}
 						NoExceptionsTime.f_Stop();
 					}
-					
+
 
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false) && DMibExpr(2));
 /*					ExceptionsLambdaTime /= 10000;
@@ -193,7 +193,7 @@ namespace
 		//					throw;
 						}
 					).f_Execute();
-					
+
 
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true));
 				}
@@ -224,7 +224,7 @@ namespace
 		//					throw;
 						}
 					).f_Execute();
-					
+
 
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true) && DMibExpr(2));
 				}
@@ -253,7 +253,7 @@ namespace
 							//throw;
 						}
 					).f_Execute();
-					
+
 
 					DMibTest(DMibExpr(ExceptionCaught) == DMibExpr(2));
 				}

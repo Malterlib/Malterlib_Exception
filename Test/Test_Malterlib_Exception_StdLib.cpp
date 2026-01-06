@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #ifndef DMalterlib
@@ -47,29 +47,29 @@ void fg_TestException()
 
 int
 #ifdef _MSC_VER
-__cdecl 
+__cdecl
 #endif
 main()
 {
-	
+
 	std::cout << "Hello!\n";
-	
+
 	fg_TestException();
-	
+
 	return 0;
 }
 
-int 
+int
 #ifdef _MSC_VER
-__cdecl 
+__cdecl
 #endif
 wmain()
 {
-	
+
 	std::cout << "Hello!\n";
-	
+
 	fg_TestException();
-	
+
 	return 0;
 }
 

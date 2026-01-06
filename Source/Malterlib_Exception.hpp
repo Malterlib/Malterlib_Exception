@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #pragma once
@@ -116,7 +116,7 @@ namespace NMib::NException
 			: m_Exceptions(fg_Move(_Exceptions))
 		{
 		}
-		
+
 		template <typename tf_CStream>
 		void f_Stream(tf_CStream &_Stream)
 		{

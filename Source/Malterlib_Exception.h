@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #pragma once
@@ -19,7 +19,7 @@
 namespace NMib::NException
 {
 	using CExceptionPointer = std::exception_ptr;
-	
+
 	class CDisableExceptionFilterScope;
 
 	inline_always int fg_UncaughtExceptions()
@@ -150,7 +150,7 @@ namespace NMib::NException
 #			define DMibImpErrorClass_TypeRegistry(d_CClass) DMibConcurrencyRegisterException(d_CClass)
 #		else
 #			define DMibException_TypeHash(d_Type) 0
-#			define DMibImpErrorClass_TypeRegistry(d_CClass) 
+#			define DMibImpErrorClass_TypeRegistry(d_CClass)
 #		endif
 
 	class CException : public CExceptionBase
