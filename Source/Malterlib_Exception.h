@@ -83,8 +83,6 @@ namespace NMib::NException
 		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStrNonTracked const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 
 		template <typename t_CError>
-		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::TCStrAggregate<t_CError> const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
-		template <typename t_CError>
 		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::TCStr<t_CError> const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 
 		CExceptionBase(const CExceptionBase&_Other);
