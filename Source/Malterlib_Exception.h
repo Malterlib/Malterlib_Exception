@@ -382,7 +382,30 @@ namespace NMib::NException
 			static uint32 ms_TypeHash;\
 		private:\
 			void fp_RegisterTypeRegistry() const;\
-		};\
+		};
+
+#		define DMibImpErrorSpecificClassParentDefine(d_CClass, d_CParent, d_CSpecificType) \
+		class d_CClass : public d_CParent\
+		{\
+		public:\
+			template <typename t_CError>\
+			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _SpecificData, _bStackTrace, _TypeHash)\
+			{\
+				fp_RegisterTypeRegistry();\
+			}\
+			template <typename t_CError>\
+			d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _SpecificData, _bStackTrace, _TypeHash)\
+			{\
+				fp_RegisterTypeRegistry();\
+			}\
+			NMib::NException::CExceptionPointer f_ExceptionPointer() const override;\
+			~d_CClass();\
+			static uint32 ms_TypeHash;\
+		private:\
+			void fp_RegisterTypeRegistry() const;\
+		};
 
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
 	|	Class:				A memory exception										|
