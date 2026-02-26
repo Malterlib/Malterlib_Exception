@@ -421,7 +421,7 @@ namespace NMib::NException
 		if (g_EnableExceptionTrace.f_WasDestructed() || !g_EnableExceptionTrace.f_IsConstructed())
 			return;
 
-		if (_bTrace && (**g_EnableExceptionTrace).m_bEnableTrace.f_Load(NAtomic::EMemoryOrder_Relaxed))
+		if (_bTrace && (**g_EnableExceptionTrace).m_bEnableTrace.f_Load(NAtomic::gc_MemoryOrder_Relaxed))
 		{
 			NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}: {}" DMibNewLine) << m_pFile << m_Line << m_pClass << f_GetErrorCharPointer()).f_GetStr().f_GetStr());
 
