@@ -9,6 +9,7 @@
 #include <Mib/Concurrency/AsyncResult>
 #include <Mib/Test/Exception>
 #include <Mib/Test/Performance>
+#include <Mib/Time/PerfTimeMeasure>
 
 namespace NMib::NException
 {
@@ -98,9 +99,9 @@ namespace
 					volatile int bThrowException = false;
 					bool bExceptionCaught = false;
 
-					NMib::NTime::CCyclesMin ExceptionsLambdaTime;
-					NMib::NTime::CCyclesMin ExceptionsTime;
-					NMib::NTime::CCyclesMin NoExceptionsTime;
+					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsLambdaTime;
+					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsTime;
+					NMib::NTime::CPrefCyclesTimeMeasureMin NoExceptionsTime;
 					for (mint i = 0; i < 10; ++i)
 					{
 						ExceptionsLambdaTime.f_Start();
