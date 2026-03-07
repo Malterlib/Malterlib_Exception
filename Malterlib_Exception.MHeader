@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 Import "../Core/Lib_Malterlib.MTarget"
@@ -41,7 +41,7 @@ Property
 Property
 {
 	!!MalterlibEnableInternalTests true
-	
+
 	MalterlibTests =+ "Malterlib_Exception"
 	MalterlibTestFiles_Malterlib_Exception: [type(CEntity)] = ["Test/*"->MakeAbsolute()]
 	MalterlibTestDependencies_Malterlib_Exception: [type(CEntity)] = ["Lib_Malterlib_Concurrency"]
@@ -50,20 +50,23 @@ Property
 
 %Target "Exe_MalterlibTests_NoMalterlib"
 {
-	!!PlatformFamily "Emscripten"
 	!!PlatformFamily "Windows"
+
 	Property.MalterlibDisableMalterlib true
 	{
 	}
+
 	Compile
 	{
 		!!CompileDialect "C"
 		PrefixHeader undefined
 	}
+
 	Target
 	{
 		BaseName "MalterlibTests_NoMalterlib"
 	}
+
 	%Group "Source"
 	{
 		%File "../../../Exception/Test/Test_Malterlib_Exception_StdLib.cpp"
