@@ -94,7 +94,7 @@ namespace NMib::NException
 		return fg_ExceptionString(fg_CurrentException());
 	}
 
-	bool CExceptionBase::operator == (CExceptionBase const &_Other) const
+	bool CExceptionBase::operator == (CExceptionBase const &_Other) const noexcept
 	{
 		return NStr::fg_StrCmp(f_GetErrorCharPointer(), _Other.f_GetErrorCharPointer()) == 0
 			&& NStr::fg_StrCmp(f_GetClass(), _Other.f_GetClass()) == 0
