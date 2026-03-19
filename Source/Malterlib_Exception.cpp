@@ -235,7 +235,7 @@ namespace NMib::NException
 #endif
 	}
 
-	NStr::CStr CCallstack::f_GetFunctionName(mint _iCallstack) const
+	NStr::CStr CCallstack::f_GetFunctionName(umint _iCallstack) const
 	{
 		if (_iCallstack >= m_CallstackLen)
 			return {};
@@ -260,7 +260,7 @@ namespace NMib::NException
 		NStr::CStrNonTracked FunctionName;
 		NStr::CStrNonTracked ClassName;
 
-		mint nOpen = 0;
+		umint nOpen = 0;
 		ch8 const *pParse = _pFunction;
 		ch8 const *pIdentStart = pParse;
 		bool bFoundFunction = false;
@@ -361,9 +361,9 @@ namespace NMib::NException
 		return _pFunction;
 	}
 
-	void CCallstack::f_Trace(mint _Indent) const
+	void CCallstack::f_Trace(umint _Indent) const
 	{
-		for (mint i = 0; i < m_CallstackLen; ++i)
+		for (umint i = 0; i < m_CallstackLen; ++i)
 		{
 			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
 			if (pInfo)
@@ -394,10 +394,10 @@ namespace NMib::NException
 		}
 	}
 
-	NStr::CStr CCallstack::f_GetString(mint _Indent) const
+	NStr::CStr CCallstack::f_GetString(umint _Indent) const
 	{
 		NStr::CStr Output;
-		for (mint i = 0; i < m_CallstackLen; ++i)
+		for (umint i = 0; i < m_CallstackLen; ++i)
 		{
 			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
 			if (pInfo)
@@ -504,7 +504,7 @@ namespace NMib::NException
 		return nullptr;
 	}
 
-	NStr::CStr CExceptionBase::f_GetCallstackStr(mint _Indent) const
+	NStr::CStr CExceptionBase::f_GetCallstackStr(umint _Indent) const
 	{
 		if (m_pCallstack)
 		{
@@ -610,7 +610,7 @@ namespace NMib::NException
 	{
 		struct CErrorEntry
 		{
-			mint m_nInstances = 0;
+			umint m_nInstances = 0;
 
 			DMibListLinkDS_Link(CErrorEntry, m_Link);
 		};

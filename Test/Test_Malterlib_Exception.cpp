@@ -102,10 +102,10 @@ namespace
 					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsLambdaTime;
 					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsTime;
 					NMib::NTime::CPrefCyclesTimeMeasureMin NoExceptionsTime;
-					for (mint i = 0; i < 10; ++i)
+					for (umint i = 0; i < 10; ++i)
 					{
 						ExceptionsLambdaTime.f_Start();
-						for (mint i = 0; i < 10000; ++i)
+						for (umint i = 0; i < 10000; ++i)
 						{
 							NMib::NException::fg_Try
 							(
@@ -135,10 +135,10 @@ namespace
 					}
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false));
 
-					for (mint i = 0; i < 10; ++i)
+					for (umint i = 0; i < 10; ++i)
 					{
 						ExceptionsTime.f_Start();
-						for (mint i = 0; i < 10000; ++i)
+						for (umint i = 0; i < 10000; ++i)
 						{
 							try
 							{
@@ -157,10 +157,10 @@ namespace
 						ExceptionsTime.f_Stop();
 					}
 
-					for (mint i = 0; i < 10; ++i)
+					for (umint i = 0; i < 10; ++i)
 					{
 						NoExceptionsTime.f_Start();
-						for (mint i = 0; i < 10000; ++i)
+						for (umint i = 0; i < 10000; ++i)
 						{
 							if (bThrowException)
 								throw int(30);
@@ -284,22 +284,22 @@ namespace
 			DMibTestSuite(CTestCategory("GetExceptionString") << CTestGroup("Performance"))
 			{
 				CTestPerformance PerfTotal(0.75, false);
-				mint nIterations = 11;
+				umint nIterations = 11;
 #ifdef DMibDebug
-				mint nTests = 10000;
+				umint nTests = 10000;
 #else
-				mint nTests = 100000;
+				umint nTests = 100000;
 #endif
 				CAsyncResult Result;
 				Result.f_SetException(fg_MakeException(DMibErrorInstance("Test error")));
 				{
 					CTestPerformanceMeasure Measure("Malterlib");
-					for (mint i = 0; i < nIterations; ++i)
+					for (umint i = 0; i < nIterations; ++i)
 					{
 						Measure.f_Start();
 						[&]() inline_never
 							{
-								for (mint i = 0; i < nTests; ++i)
+								for (umint i = 0; i < nTests; ++i)
 									Result.f_GetExceptionStr();
 							}
 							()

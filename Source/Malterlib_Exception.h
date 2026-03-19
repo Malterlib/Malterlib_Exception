@@ -46,16 +46,16 @@ namespace NMib::NException
 
 	struct CCallstack
 	{
-		void f_Trace(mint _Indent) const;
-		NStr::CStr f_GetString(mint _Indent) const;
-		NStr::CStr f_GetFunctionName(mint _iCallstack) const;
+		void f_Trace(umint _Indent) const;
+		NStr::CStr f_GetString(umint _Indent) const;
+		NStr::CStr f_GetFunctionName(umint _iCallstack) const;
 		static NStr::CStrNonTracked fs_ShortenFunctionName(ch8 const *_pFunction);
 		void f_Capture();
 
-		constexpr static mint mc_StackSize = 128;
+		constexpr static umint mc_StackSize = 128;
 
 		CMibCodeAddress m_Callstack[mc_StackSize];
-		mint m_CallstackLen = 0;
+		umint m_CallstackLen = 0;
 	};
 
 	class CExceptionBase
@@ -100,7 +100,7 @@ namespace NMib::NException
 		void f_TraceException(bool _bTrace) const;
 #endif
 		CCallstack const *f_GetCallstack() const;
-		NStr::CStr f_GetCallstackStr(mint _Indent) const;
+		NStr::CStr f_GetCallstackStr(umint _Indent) const;
 
 		bool operator == (CExceptionBase const &_Other) const noexcept;
 

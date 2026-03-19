@@ -47,39 +47,39 @@ namespace
 		{
 			DMibTestSuite(CTestCategory("MakeException") << CTestGroup("Performance"))
 			{
-				constexpr mint c_nTests = 5;
+				constexpr umint c_nTests = 5;
 #ifdef DMibDebug
-				constexpr mint c_nExceptions = 10000;
+				constexpr umint c_nExceptions = 10000;
 #else
-				constexpr mint c_nExceptions = 100000;
+				constexpr umint c_nExceptions = 100000;
 #endif
 
 				CTestPerformanceMeasure SharedPtrTime("SharedPtr");
 				CTestPerformanceMeasure MalterlibTime("Malterlib");
 				CTestPerformanceMeasure StdTime("Std");
 
-				for (mint i = 0; i < c_nTests; ++i)
+				for (umint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(SharedPtrTime, c_nExceptions);
-					for (mint i = 0; i < c_nExceptions; ++i)
+					for (umint i = 0; i < c_nExceptions; ++i)
 					{
 						[[maybe_unused]] TCSharedPointer<CException> pException = fg_Construct("CException", DMibPFile, DMibPLine, DMibPFunction, "Test", false);
 					}
 				}
 
-				for (mint i = 0; i < c_nTests; ++i)
+				for (umint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
-					for (mint i = 0; i < c_nExceptions; ++i)
+					for (umint i = 0; i < c_nExceptions; ++i)
 					{
 						[[maybe_unused]] auto pTest = fg_MakeException(DMibErrorInstance("Test"));
 					}
 				}
 
-				for (mint i = 0; i < c_nTests; ++i)
+				for (umint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(StdTime, c_nExceptions);
-					for (mint i = 0; i < c_nExceptions; ++i)
+					for (umint i = 0; i < c_nExceptions; ++i)
 					{
 						[[maybe_unused]] auto pTest = std::make_exception_ptr(DMibErrorInstance("Test"));
 					}
@@ -93,11 +93,11 @@ namespace
 			};
 			DMibTestSuite(CTestCategory("VisitException") << CTestGroup("Performance"))
 			{
-				constexpr mint c_nTests = 5;
+				constexpr umint c_nTests = 5;
 #ifdef DMibDebug
-				constexpr mint c_nExceptions = 10000;
+				constexpr umint c_nExceptions = 10000;
 #else
-				constexpr mint c_nExceptions = 100000;
+				constexpr umint c_nExceptions = 100000;
 #endif
 
 #		define DMibErrorInstanceMemory(_Description) DMibImpExceptionInstance(NMib::NException::CExceptionMemory, _Description)
@@ -107,10 +107,10 @@ namespace
 				CTestPerformanceMeasure DirectTime("Direct");
 				CTestPerformanceMeasure MalterlibTime("Malterlib");
 
-				for (mint i = 0; i < c_nTests; ++i)
+				for (umint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(DirectTime, c_nExceptions);
-					for (mint i = 0; i < c_nExceptions; ++i)
+					for (umint i = 0; i < c_nExceptions; ++i)
 					{
 						fg_VisitExceptionDirect
 							(
@@ -123,10 +123,10 @@ namespace
 					}
 				}
 
-				for (mint i = 0; i < c_nTests; ++i)
+				for (umint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
-					for (mint i = 0; i < c_nExceptions; ++i)
+					for (umint i = 0; i < c_nExceptions; ++i)
 					{
 						fg_VisitException<NException::CExceptionPureCall, NException::CExceptionMemory, NException::CException>
 							(
