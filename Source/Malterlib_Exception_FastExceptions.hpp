@@ -80,15 +80,21 @@ namespace NMib::NException
 
 	namespace NPrivate
 	{
+		// inline_never_coro_exception_workaround: this slow path uses rethrow_exception +
+		// try/catch. When it is called from a coroutine (e.g. a TCFuture actor function)
+		// the compiler will otherwise inline the try/catch into the coroutine resume body,
+		// and clang-cl/MSVC WinEH codegen for catch funclets inside a coroutine that has
+		// already suspended is broken (crashes in Release, works in Debug because nothing
+		// inlines). Keeping the try/catch in its own ordinary stack frame avoids it.
 		template <typename tf_FOnValid>
-		bool fg_VisitExceptionHelper(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid, NMeta::TCTypeList<>)
+		inline_never_coro_exception_workaround bool fg_VisitExceptionHelper(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid, NMeta::TCTypeList<>)
 		{
 			std::rethrow_exception(_pException);
 			return false;
 		}
 
 		template <typename tf_CFirstException, typename ...tfp_CExceptions, typename tf_FOnValid>
-		bool fg_VisitExceptionHelper(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid, NMeta::TCTypeList<tf_CFirstException, tfp_CExceptions...>)
+		inline_never_coro_exception_workaround bool fg_VisitExceptionHelper(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid, NMeta::TCTypeList<tf_CFirstException, tfp_CExceptions...>)
 		{
 			try
 			{
@@ -103,8 +109,11 @@ namespace NMib::NException
 		}
 	}
 
+	// inline_never_coro_exception_workaround: see the note on fg_VisitExceptionHelper
+	// above. The try/catch must not be inlined into a coroutine resume body or clang-cl/MSVC
+	// miscompiles the catch funclet in optimized builds.
 	template <typename ...tfp_CExceptions, typename tf_FOnValid>
-	bool fg_VisitException(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid)
+	inline_never_coro_exception_workaround bool fg_VisitException(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid)
 	{
 		CDisableExceptionFilterScope DisableExceptionFilter;
 		try
@@ -118,8 +127,10 @@ namespace NMib::NException
 		return false;
 	}
 
+	// inline_never_coro_exception_workaround: same coroutine try/catch miscompile as
+	// fg_VisitException above.
 	template <typename tf_CException>
-	bool fg_ExceptionIsOfType(CExceptionPointer const &_pException)
+	inline_never_coro_exception_workaround bool fg_ExceptionIsOfType(CExceptionPointer const &_pException)
 	{
 		CDisableExceptionFilterScope DisableExceptionFilter;
 		try
