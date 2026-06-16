@@ -45,6 +45,46 @@ namespace
 	public:
 		void f_DoTests()
 		{
+			DMibTestSuite("FastExceptionPointerRegression")
+			{
+				CExceptionPointer pEmptyException;
+
+				DMibTest(!DMibExpr(fg_ExceptionIsOfType<CExceptionBase>(pEmptyException)));
+
+				bool bVisitedEmptyException = false;
+				bVisitedEmptyException = fg_VisitException<CExceptionBase>
+					(
+						pEmptyException
+						, [&](auto &&)
+						{
+							bVisitedEmptyException = true;
+						}
+					)
+				;
+				DMibTest(!DMibExpr(bVisitedEmptyException));
+
+				auto pException = fg_MakeException(DMibErrorInstance("Test exception"));
+				auto pMovedException = fg_Move(pException);
+
+				DMibTest(DMibExpr(fg_ExceptionIsOfType<CExceptionBase>(pMovedException)));
+
+				if (!pException)
+				{
+					DMibTest(!DMibExpr(fg_ExceptionIsOfType<CExceptionBase>(pException)));
+
+					bool bVisitedMovedFromException = false;
+					bVisitedMovedFromException = fg_VisitException<CExceptionBase>
+						(
+							pException
+							, [&](auto &&)
+							{
+								bVisitedMovedFromException = true;
+							}
+						)
+					;
+					DMibTest(!DMibExpr(bVisitedMovedFromException));
+				}
+			};
 			DMibTestSuite(CTestCategory("MakeException") << CTestGroup("Performance"))
 			{
 				constexpr umint c_nTests = 5;
@@ -149,4 +189,3 @@ namespace
 
 	DMibTestRegister(CExceptionPointer_Tests, Malterlib::Exception);
 }
-
