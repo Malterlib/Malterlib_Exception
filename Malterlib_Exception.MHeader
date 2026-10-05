@@ -23,7 +23,6 @@ Import "../Core/Lib_Malterlib.MTarget"
 	}
 }
 
-
 Property
 {
 	MalterlibLibrary_Exception: bool = MalterlibLibrary_All
@@ -46,7 +45,6 @@ Property
 	MalterlibTestFiles_Malterlib_Exception: [type(CEntity)] = ["Test/*"->MakeAbsolute()]
 	MalterlibTestDependencies_Malterlib_Exception: [type(CEntity)] = ["Lib_Malterlib_Concurrency"]
 }
-
 
 %Target "Exe_MalterlibTests_NoMalterlib"
 {
@@ -109,4 +107,3 @@ Compile
 		!!MalterlibException_SupportStackTraces false
 	}
 }
-

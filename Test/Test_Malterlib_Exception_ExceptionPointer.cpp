@@ -102,27 +102,21 @@ namespace
 				{
 					DMibTestScopeMeasure(SharedPtrTime, c_nExceptions);
 					for (umint i = 0; i < c_nExceptions; ++i)
-					{
 						[[maybe_unused]] TCSharedPointer<CException> pException = fg_Construct("CException", DMibPFile, DMibPLine, DMibPFunction, "Test", false);
-					}
 				}
 
 				for (umint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
 					for (umint i = 0; i < c_nExceptions; ++i)
-					{
 						[[maybe_unused]] auto pTest = fg_MakeException(DMibErrorInstance("Test"));
-					}
 				}
 
 				for (umint i = 0; i < c_nTests; ++i)
 				{
 					DMibTestScopeMeasure(StdTime, c_nExceptions);
 					for (umint i = 0; i < c_nExceptions; ++i)
-					{
 						[[maybe_unused]] auto pTest = std::make_exception_ptr(DMibErrorInstance("Test"));
-					}
 				}
 
 				CTestPerformance Performing(1.0);
@@ -140,7 +134,7 @@ namespace
 				constexpr umint c_nExceptions = 100000;
 #endif
 
-#		define DMibErrorInstanceMemory(_Description) DMibImpExceptionInstance(NMib::NException::CExceptionMemory, _Description)
+#define DMibErrorInstanceMemory(_Description) DMibImpExceptionInstance(NMib::NException::CExceptionMemory, _Description)
 
 				auto pException = fg_MakeException(DMibErrorInstanceMemory("Test exception"));
 

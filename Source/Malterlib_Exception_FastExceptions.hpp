@@ -22,7 +22,7 @@ namespace NMib::NException
 
 		auto *pExceptionMemory = __cxa_allocate_exception(sizeof(CException));
 
-		new (pExceptionMemory) CException(fg_Forward<tf_CException>(_Exception));
+		new(pExceptionMemory) CException(fg_Forward<tf_CException>(_Exception));
 
 		__cxa_make_exception_ptr
 			(
@@ -94,7 +94,12 @@ namespace NMib::NException
 		}
 
 		template <typename tf_CFirstException, typename ...tfp_CExceptions, typename tf_FOnValid>
-		inline_never_coro_exception_workaround bool fg_VisitExceptionHelper(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid, NMeta::TCTypeList<tf_CFirstException, tfp_CExceptions...>)
+		inline_never_coro_exception_workaround bool fg_VisitExceptionHelper
+			(
+				CExceptionPointer const &_pException
+				, tf_FOnValid &&_fOnValid
+				, NMeta::TCTypeList<tf_CFirstException, tfp_CExceptions...>
+			)
 		{
 			try
 			{
