@@ -59,28 +59,28 @@ namespace NMib::NException
 	{
 		NStr::CStr Return;
 		if
+		(
+			!NException::fg_VisitException<NException::CExceptionBase>
 			(
-				!NException::fg_VisitException<NException::CExceptionBase>
+				_pExceptionPointer
+				, [&](NException::CExceptionBase const &_Exception)
+				{
+					Return = _Exception.f_GetErrorStr();
+				}
+			)
+		)
+		{
+			if
+			(
+				!NException::fg_VisitException<std::exception>
 				(
 					_pExceptionPointer
-					, [&](NException::CExceptionBase const& _Exception)
+					, [&](std::exception const &_Exception)
 					{
-						Return = _Exception.f_GetErrorStr();
+						Return = _Exception.what();
 					}
 				)
 			)
-		{
-			if
-				(
-					!NException::fg_VisitException<std::exception>
-					(
-						_pExceptionPointer
-						, [&](std::exception const &_Exception)
-						{
-							Return = _Exception.what();
-						}
-					)
-				)
 			{
 				return NStr::gc_Str<"Unknown exception type">;
 			}
@@ -96,12 +96,10 @@ namespace NMib::NException
 
 	bool CExceptionBase::operator == (CExceptionBase const &_Other) const noexcept
 	{
-		return NStr::fg_StrCmp(f_GetErrorCharPointer(), _Other.f_GetErrorCharPointer()) == 0
-			&& NStr::fg_StrCmp(f_GetClass(), _Other.f_GetClass()) == 0
-		;
+		return NStr::fg_StrCmp(f_GetErrorCharPointer(), _Other.f_GetErrorCharPointer()) == 0 && NStr::fg_StrCmp(f_GetClass(), _Other.f_GetClass()) == 0;
 	}
 
-	CExceptionBase &CExceptionBase::operator =(const CExceptionBase&_Other)
+	CExceptionBase &CExceptionBase::operator = (CExceptionBase const &_Other)
 	{
 		m_Magic = mcp_Magic;
 		m_pClass = _Other.m_pClass;
@@ -117,7 +115,7 @@ namespace NMib::NException
 		return *this;
 	}
 
-	void CExceptionBase::fp_Copy(const CExceptionBase &_Other)
+	void CExceptionBase::fp_Copy(CExceptionBase const &_Other)
 	{
 		if (_Other.m_pErrorAlloc)
 		{
@@ -138,7 +136,7 @@ namespace NMib::NException
 			m_pCallstackNonTracked = fg_Copy(_Other.m_pCallstackNonTracked);
 	}
 
-	CExceptionBase::CExceptionBase(const CExceptionBase&_Other)
+	CExceptionBase::CExceptionBase(CExceptionBase const &_Other)
 		: m_Magic(mcp_Magic)
 		, m_pClass(_Other.m_pClass)
 		, m_pFile(_Other.m_pFile)
@@ -149,7 +147,7 @@ namespace NMib::NException
 		fp_Copy(_Other);
 	}
 
-	void CExceptionBase::fp_Construct(const ch8 *_pError, bool _bTrace, bool _bStackTrace)
+	void CExceptionBase::fp_Construct(ch8 const *_pError, bool _bTrace, bool _bStackTrace)
 	{
 #if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
@@ -170,7 +168,7 @@ namespace NMib::NException
 #endif
 	}
 
-	void CExceptionBase::fp_ConstructNonTracked(const ch8 *_pError, bool _bTrace, bool _bStackTrace)
+	void CExceptionBase::fp_ConstructNonTracked(ch8 const *_pError, bool _bTrace, bool _bStackTrace)
 	{
 #if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
@@ -191,7 +189,7 @@ namespace NMib::NException
 #endif
 	}
 
-	CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+	CExceptionBase::CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
 		: m_Magic(mcp_Magic)
 		, m_pClass(_pClass ? _pClass : "CExceptionBase")
 		, m_pFile(_pFile ? _pFile : "Unknown")
@@ -213,7 +211,17 @@ namespace NMib::NException
 #endif
 	}
 
-	CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStrNonTracked const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+	CExceptionBase::CExceptionBase
+		(
+			ch8 const *_pClass
+			, ch8 const *_pFile
+			, aint _Line
+			, ch8 const *_pFunction
+			, NStr::CStrNonTracked const &_Error
+			, bool _bTrace
+			, bool _bStackTrace
+			, uint32 _TypeHash
+		)
 		: m_Magic(mcp_Magic)
 		, m_pClass(_pClass ? _pClass : "CExceptionBase")
 		, m_pFile(_pFile ? _pFile : "Unknown")
@@ -423,7 +431,11 @@ namespace NMib::NException
 
 		if (_bTrace && (**g_EnableExceptionTrace).m_bEnableTrace.f_Load(NAtomic::gc_MemoryOrder_Relaxed))
 		{
-			NSys::fg_DebugOutput((NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}: {}" DMibNewLine) << m_pFile << m_Line << m_pClass << f_GetErrorCharPointer()).f_GetStr().f_GetStr());
+			NSys::fg_DebugOutput
+				(
+					(NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}: {}" DMibNewLine) << m_pFile << m_Line << m_pClass << f_GetErrorCharPointer()).f_GetStr().f_GetStr()
+				)
+			;
 
 			if (m_pCallstack)
 				m_pCallstack->f_Trace(0);
@@ -431,7 +443,7 @@ namespace NMib::NException
 	}
 #endif
 
-	CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, const ch8 *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+	CExceptionBase::CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, ch8 const *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
 		: m_Magic(mcp_Magic)
 		, m_pClass(_pClass ? _pClass : "CExceptionBase")
 		, m_pFile(_pFile ? _pFile : "Unknown")
@@ -452,9 +464,7 @@ namespace NMib::NException
 			m_ErrorNoAlloc[0] = 0;
 		}
 		else
-		{
 			NStr::fg_StrCopy(m_ErrorNoAlloc, _pError, 128);
-		}
 #ifdef DMibExceptionTraceEnable
 		f_TraceException(_bTrace);
 #endif
@@ -469,7 +479,7 @@ namespace NMib::NException
 		return m_Magic == mcp_Magic;
 	}
 
-	const ch8 *CExceptionBase::f_GetErrorCharPointer() const
+	ch8 const *CExceptionBase::f_GetErrorCharPointer() const
 	{
 		if (m_pErrorAlloc)
 			return *m_pErrorAlloc;
@@ -529,18 +539,21 @@ namespace NMib::NException
 			return NStr::CStrNonTracked(m_ErrorNoAlloc);
 	}
 
-	const ch8 *CExceptionBase::f_GetClass() const
+	ch8 const *CExceptionBase::f_GetClass() const
 	{
 		return m_pClass;
 	}
-	const ch8 *CExceptionBase::f_GetFile() const
+
+	ch8 const *CExceptionBase::f_GetFile() const
 	{
 		return m_pFile;
 	}
-	const ch8 *CExceptionBase::f_GetFunction() const
+
+	ch8 const *CExceptionBase::f_GetFunction() const
 	{
 		return m_pFunction;
 	}
+
 	int32 CExceptionBase::f_GetLine() const
 	{
 		return m_Line;
@@ -625,11 +638,7 @@ namespace NMib::NException
 
 		void fg_FlattenException(NContainer::TCVector<CExceptionPointer> &o_Exceptions, CCollectedErrors &o_Errors, CExceptionPointer &&_pException)
 		{
-			bool bHandled = NException::fg_VisitException
-				<
-					CExceptionExceptionVector
-					, CExceptionBase
-				>
+			bool bHandled = NException::fg_VisitException<CExceptionExceptionVector, CExceptionBase>
 				(
 					_pException
 					, [&]<typename tf_CException>(tf_CException &&_Exception)
