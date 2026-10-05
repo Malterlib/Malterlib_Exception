@@ -22,7 +22,17 @@ namespace NMib::NException
 	}
 
 	template <typename t_CError>
-	CExceptionBase::CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::TCStr<t_CError> const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+	CExceptionBase::CExceptionBase
+		(
+			ch8 const *_pClass
+			, ch8 const *_pFile
+			, aint _Line
+			, ch8 const *_pFunction
+			, NStr::TCStr<t_CError> const &_Error
+			, bool _bTrace
+			, bool _bStackTrace
+			, uint32 _TypeHash
+		)
 		: m_Magic(mcp_Magic)
 		, m_pClass(_pClass ? _pClass : "CExceptionBase")
 		, m_pFile(_pFile ? _pFile : "Unknown")
@@ -63,6 +73,7 @@ namespace NMib::NException
 		: mp_bOldEnable(fg_SetEnableExceptionTrace(false))
 	{
 	}
+
 	CDisableExceptionTraceScope::~CDisableExceptionTraceScope()
 	{
 		fg_SetEnableExceptionTrace(mp_bOldEnable);
@@ -158,7 +169,8 @@ namespace NMib::NException
 	DMibImpErrorSpecificClassDefine(CExceptionExceptionVector, CException, CExceptionExceptionVectorData);
 
 #	define DMibErrorExceptionVector(d_Description, d_Specific, ...) DMibImpErrorSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
-#	define DMibErrorInstanceExceptionVector(d_Description, d_Specific, ...) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
+#	define DMibErrorInstanceExceptionVector(d_Description, d_Specific, ...) \
+			DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
 }
 
 namespace NMib::NException
