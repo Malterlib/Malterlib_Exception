@@ -5,6 +5,12 @@
 
 #include <Mib/Core/Core>
 
+namespace NMib::NConcurrency::NPrivate
+{
+	void fg_FeedException(NStream::CBinaryStreamDefault &_Stream, NException::CExceptionPointer const &_pException, bool _bVersioned);
+	NException::CExceptionPointer fg_ConsumeException(NStream::CBinaryStreamDefault &_Stream, bool _bVersioned);
+}
+
 namespace NMib::NException
 {
 	template <typename t_CFormatter>
@@ -79,10 +85,18 @@ namespace NMib::NException
 		{
 		}
 
+		static constexpr uint32 mc_StreamVersion = 1; // 1: m_pWrapped with its own stream version
+
+		// From version 1 the reader has exception stream versions, so the wrapped exception streams with its own version too
 		template <typename tf_CStream>
 		void f_Stream(tf_CStream &_Stream)
 		{
-			_Stream % m_pWrapped;
+			bool bVersioned = _Stream.f_GetVersion() >= 1;
+
+			if constexpr (tf_CStream::mc_bFeed)
+				NConcurrency::NPrivate::fg_FeedException(_Stream, m_pWrapped, bVersioned);
+			else
+				m_pWrapped = NConcurrency::NPrivate::fg_ConsumeException(_Stream, bVersioned);
 		}
 
 		CExceptionPointer m_pWrapped;
@@ -102,10 +116,30 @@ namespace NMib::NException
 		{
 		}
 
+		static constexpr uint32 mc_StreamVersion = 1; // 1: m_Exceptions with their own stream versions
+
+		// From version 1 the reader has exception stream versions, so each exception streams with its own version too
 		template <typename tf_CStream>
 		void f_Stream(tf_CStream &_Stream)
 		{
-			_Stream % m_Exceptions;
+			bool bVersioned = _Stream.f_GetVersion() >= 1;
+
+			if constexpr (tf_CStream::mc_bFeed)
+			{
+				NStream::fg_FeedLenToStream(_Stream, m_Exceptions.f_GetLen());
+				for (auto &pException : m_Exceptions)
+					NConcurrency::NPrivate::fg_FeedException(_Stream, pException, bVersioned);
+			}
+			else
+			{
+				uint64 nExceptions = 0;
+				NStream::fg_ConsumeLenFromStream(_Stream, nExceptions);
+				NStream::fg_CheckLengthLimit(_Stream, nExceptions);
+
+				m_Exceptions.f_Clear();
+				for (uint64 iException = 0; iException < nExceptions; ++iException)
+					m_Exceptions.f_Insert(NConcurrency::NPrivate::fg_ConsumeException(_Stream, bVersioned));
+			}
 		}
 
 		NContainer::TCVector<CExceptionPointer> m_Exceptions;
@@ -127,27 +161,84 @@ namespace NMib::NException
 #	define DMibErrorInstanceExceptionVector(d_Description, d_Specific, ...) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
 }
 
-namespace NMib::NConcurrency::NPrivate
+namespace NMib::NException
 {
-	void fg_FeedException(NStream::CBinaryStreamDefault &_Stream, NException::CExceptionPointer const &_pException);
-	void fg_FeedException(NStream::CBinaryStreamDefault &_Stream, NException::CExceptionBase const &_pException);
-	NException::CExceptionPointer fg_ConsumeException(NStream::CBinaryStreamDefault &_Stream);
+	/// An exception pointer that streams with the exception's stream version by default, so the reader gets the fields added in newer
+	/// versions. Readers without exception stream versions, and data streamed before, misread that. When the reader can be older, take
+	/// _bVersioned from the containing data's stream version, on both sides: the stream doesn't say which format it holds.
+	struct CStreamableExceptionPointer
+	{
+		CStreamableExceptionPointer() = default;
+		explicit CStreamableExceptionPointer(bool _bVersioned)
+			: m_bVersioned(_bVersioned)
+		{
+		}
+
+		CStreamableExceptionPointer(CExceptionPointer const &_pException, bool _bVersioned = true)
+			: m_pException(_pException)
+			, m_bVersioned(_bVersioned)
+		{
+		}
+
+		CStreamableExceptionPointer(CExceptionPointer &&_pException, bool _bVersioned = true)
+			: m_pException(fg_Move(_pException))
+			, m_bVersioned(_bVersioned)
+		{
+		}
+
+		CExceptionPointer m_pException;
+		bool m_bVersioned = true;
+	};
 }
 
 namespace NMib::NStream
 {
 	template <typename t_CStream>
+	class TCBinaryStreamTypeReference<t_CStream, NException::CStreamableExceptionPointer>
+	{
+	public:
+		static void fs_Feed(t_CStream &_Stream, NException::CStreamableExceptionPointer const &_Data)
+		{
+			NConcurrency::NPrivate::fg_FeedException(_Stream, _Data.m_pException, _Data.m_bVersioned);
+		}
+
+		static void fs_Consume(t_CStream &_Stream, NException::CStreamableExceptionPointer &_Data)
+		{
+			_Data.m_pException = NConcurrency::NPrivate::fg_ConsumeException(_Stream, _Data.m_bVersioned);
+		}
+	};
+
+	// A plain exception pointer has no stream format, because the exception's own fields change between versions and only the
+	// containing data knows whether its reader has exception stream versions. Stream a CStreamableExceptionPointer instead. When the
+	// reader can be older, give the containing data an mc_StreamVersion and pass whether that version has exception stream versions
+	// as its _bVersioned, or to NConcurrency::NPrivate::fg_FeedException and fg_ConsumeException like CExceptionWrappedData::f_Stream.
+	// Distributed actor calls stream their exceptions with the protocol version and need neither.
+	template <typename t_CStream>
 	class TCBinaryStreamTypeReference<t_CStream, NException::CExceptionPointer>
 	{
 	public:
-		static constexpr void fs_Feed(t_CStream &_Stream, NException::CExceptionPointer const &_Data)
+		template <typename tf_CData>
+		static void fs_Feed(t_CStream &_Stream, tf_CData &&_Data)
 		{
-			NConcurrency::NPrivate::fg_FeedException(_Stream, _Data);
+			static_assert
+				(
+					false
+					, "CExceptionPointer can't be streamed directly. Use NException::CStreamableExceptionPointer or version the containing data,"
+					" see the comment on TCBinaryStreamTypeReference<t_CStream, NException::CExceptionPointer>"
+				)
+			;
 		}
 
-		static constexpr void fs_Consume(t_CStream &_Stream, NException::CExceptionPointer &_Data)
+		template <typename tf_CData>
+		static void fs_Consume(t_CStream &_Stream, tf_CData &_Data)
 		{
-			_Data = NConcurrency::NPrivate::fg_ConsumeException(_Stream);
+			static_assert
+				(
+					false
+					, "CExceptionPointer can't be streamed directly. Use NException::CStreamableExceptionPointer or version the containing data,"
+					" see the comment on TCBinaryStreamTypeReference<t_CStream, NException::CExceptionPointer>"
+				)
+			;
 		}
 	};
 }

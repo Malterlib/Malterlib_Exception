@@ -58,6 +58,17 @@ namespace NMib::NException
 		umint m_CallstackLen = 0;
 	};
 
+	// The version an exception's specific data streams with: its mc_StreamVersion, or 0 when it has none. The distributed actor
+	// protocol sends it with the exception and consumes with the sender's version as the stream version, so a data type that adds a
+	// field bumps mc_StreamVersion and streams the field only from that version. A data type that inherits another sets the stream
+	// version the inherited type expects before calling its f_Stream.
+	template <typename t_CData>
+	inline constexpr uint32 gc_ExceptionDataStreamVersion = 0;
+
+	template <typename t_CData>
+		requires requires { t_CData::mc_StreamVersion; }
+	inline constexpr uint32 gc_ExceptionDataStreamVersion<t_CData> = t_CData::mc_StreamVersion;
+
 	class CExceptionBase
 	{
 		const static uint32 mcp_Magic = 0xE538CB10;
@@ -77,6 +88,8 @@ namespace NMib::NException
 		void fp_ConstructNonTracked(const ch8 *_pError, bool _bTrace, bool _bStackTrace);
 		void fp_Copy(const CExceptionBase &_Other);
 	public:
+		static constexpr uint32 mc_StreamVersion = 0; // See gc_ExceptionDataStreamVersion
+
 		// If this exception could cause errors with memory management you should make sure that it's smaller than 127 characters to be able to fit in the m_ErrorNoAlloc buffer that requires no memory management.
 		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, const ch8 *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
@@ -378,6 +391,7 @@ namespace NMib::NException
 			~d_CClass();\
 			DMibImpErrorSpecificClass_Streaming(d_CParent)\
 			static uint32 ms_TypeHash;\
+			static constexpr uint32 mc_StreamVersion = NMib::NException::gc_ExceptionDataStreamVersion<d_CSpecificType>;\
 		private:\
 			void fp_RegisterTypeRegistry() const;\
 		};
