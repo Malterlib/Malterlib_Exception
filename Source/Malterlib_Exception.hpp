@@ -158,7 +158,8 @@ namespace NMib::NException
 	DMibImpErrorSpecificClassDefine(CExceptionExceptionVector, CException, CExceptionExceptionVectorData);
 
 #	define DMibErrorExceptionVector(d_Description, d_Specific, ...) DMibImpErrorSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
-#	define DMibErrorInstanceExceptionVector(d_Description, d_Specific, ...) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
+#	define DMibErrorInstanceExceptionVector(d_Description, d_Specific, ...) \
+	DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionExceptionVector, d_Description, d_Specific, ##__VA_ARGS__)
 }
 
 namespace NMib::NException

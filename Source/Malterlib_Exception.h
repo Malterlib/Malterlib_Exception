@@ -281,8 +281,10 @@ namespace NMib::NException
 #		define DMibImpErrorInstance(d_CClass, d_Description, ...) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, ##__VA_ARGS__)
 #		define DMibImpError(d_CClass, d_Description, ...) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true, ##__VA_ARGS__)
 #		define DMibImpExceptionInstance(d_CClass, d_Description, ...) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, ##__VA_ARGS__)
-#		define DMibImpErrorSpecific(d_CClass, d_Description, d_SpecificData, ...) throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true, d_SpecificData, ##__VA_ARGS__)
-#		define DMibImpExceptionInstanceSpecific(d_CClass, d_Description, d_SpecificData, ...) d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, d_SpecificData, ##__VA_ARGS__)
+#		define DMibImpErrorSpecific(d_CClass, d_Description, d_SpecificData, ...) \
+	throw d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, true, d_SpecificData, ##__VA_ARGS__)
+#		define DMibImpExceptionInstanceSpecific(d_CClass, d_Description, d_SpecificData, ...) \
+	d_CClass(nullptr, DMibPFile, DMibPLine, DMibPFunction, d_Description, false, d_SpecificData, ##__VA_ARGS__)
 
 #		define DMibError(d_Description, ...) throw NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, true, ##__VA_ARGS__)
 #		define DMibErrorInstance(d_Description, ...) NMib::NException::CException("CException", DMibPFile, DMibPLine, DMibPFunction, d_Description, false, ##__VA_ARGS__)
@@ -367,7 +369,18 @@ namespace NMib::NException
 			d_CSpecificType m_SpecificData;\
 		public:\
 			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+			d_CClass\
+				(\
+					ch8 const *_pClass\
+					, ch8 const *_pFile\
+					, aint _Line\
+					, ch8 const *_pFunction\
+					, t_CError &&_Error\
+					, bool _bTrace\
+					, d_CSpecificType const &_SpecificData = fg_Default()\
+					, bool _bStackTrace = true\
+					, uint32 _TypeHash = ms_TypeHash\
+				)\
 				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 				, m_SpecificData(_SpecificData)\
 			{\
@@ -402,7 +415,18 @@ namespace NMib::NException
 		{\
 		public:\
 			template <typename t_CError>\
-			d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+			d_CClass\
+				(\
+					ch8 const *_pClass\
+					, ch8 const *_pFile\
+					, aint _Line\
+					, ch8 const *_pFunction\
+					, t_CError &&_Error\
+					, bool _bTrace\
+					, d_CSpecificType const &_SpecificData = fg_Default()\
+					, bool _bStackTrace = true\
+					, uint32 _TypeHash = ms_TypeHash\
+				)\
 				: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _SpecificData, _bStackTrace, _TypeHash)\
 			{\
 				fp_RegisterTypeRegistry();\
