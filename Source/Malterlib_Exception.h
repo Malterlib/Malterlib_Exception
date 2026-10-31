@@ -90,7 +90,8 @@ namespace NMib::NException
 	public:
 		static constexpr uint32 mc_StreamVersion = 0; // See gc_ExceptionDataStreamVersion
 
-		// If this exception could cause errors with memory management you should make sure that it's smaller than 127 characters to be able to fit in the m_ErrorNoAlloc buffer that requires no memory management.
+		// If this exception could cause errors with memory management, keep it shorter than 127 characters so it fits in
+		// m_ErrorNoAlloc, which needs no memory management.
 		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, const ch8 *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 		CExceptionBase(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, NStr::CStrNonTracked const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
