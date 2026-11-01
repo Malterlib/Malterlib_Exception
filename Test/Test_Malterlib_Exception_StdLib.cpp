@@ -38,12 +38,11 @@ void fg_TestException()
 	{
 		fg_TestException2(&Value);
 	}
-	catch (int const& _Exception)
+	catch (int const &_Exception)
 	{
 		std::cout << "Caught " << _Exception << "\n";
 	}
 }
-
 
 int
 #ifdef _MSC_VER
@@ -51,7 +50,6 @@ __cdecl
 #endif
 main()
 {
-
 	std::cout << "Hello!\n";
 
 	fg_TestException();
@@ -65,7 +63,6 @@ __cdecl
 #endif
 wmain()
 {
-
 	std::cout << "Hello!\n";
 
 	fg_TestException();

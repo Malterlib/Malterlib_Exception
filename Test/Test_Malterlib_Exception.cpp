@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
 #ifdef DCompiler_MSVC
-#pragma warning(push,4) // force inline not inlined
-#pragma warning(default:4714) // force inline not inlined
+#	pragma warning(push,4) // force inline not inlined
+#	pragma warning(default:4714) // force inline not inlined
 #endif
 
 #include <Mib/Concurrency/AsyncResult>
@@ -17,7 +17,6 @@ namespace NMib::NException
 	class TCExceptionalCatch : public t_CParent
 	{
 	public:
-
 		t_CLambda m_Lambda;
 		inline_always TCExceptionalCatch(t_CLambda _Lambda, t_CParent _Parent)
 			: t_CParent(_Parent)
@@ -37,7 +36,7 @@ namespace NMib::NException
 			{
 				t_CParent::f_Execute();
 			}
-			catch (const t_CCatch &_Exception)
+			catch (t_CCatch const &_Exception)
 			{
 				m_Lambda(_Exception);
 			}
@@ -48,7 +47,6 @@ namespace NMib::NException
 	class TCExceptional
 	{
 	public:
-
 		t_CLambda m_Lambda;
 		inline_always TCExceptional(t_CLambda _Lambda)
 			: m_Lambda(_Lambda)
@@ -68,19 +66,19 @@ namespace NMib::NException
 	};
 
 	template <typename t_CLambda>
-	inline_always TCExceptional<t_CLambda> fg_Try(const t_CLambda &_Lambda)
+	inline_always TCExceptional<t_CLambda> fg_Try(t_CLambda const &_Lambda)
 	{
 		return TCExceptional<t_CLambda>(_Lambda);
 	}
 
 	template <typename t_CExceptional>
-	inline_always void fg_Execute(const t_CExceptional &_Lambda)
+	inline_always void fg_Execute(t_CExceptional const &_Lambda)
 	{
 		_Lambda.f_Execute();
 	}
 }
 #ifdef DCompiler_MSVC
-#pragma warning(pop) // force inline not inlined
+#	pragma warning(pop) // force inline not inlined
 #endif
 
 namespace
@@ -92,11 +90,11 @@ namespace
 	public:
 		void f_DoTests()
 		{
-			//  << CTestGroup("Unfinished")
+			// << CTestGroup("Unfinished")
 			DMibTestCategoryFlags(CTestCategory("Exception lambdas"), ETestCategoryFlag_DisableExceptionFilter | ETestCategoryFlag_Tests)
 			{
 				{
-					volatile int bThrowException = false;
+					int volatile bThrowException = false;
 					bool bExceptionCaught = false;
 
 					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsLambdaTime;
@@ -108,28 +106,29 @@ namespace
 						for (umint i = 0; i < 10000; ++i)
 						{
 							NMib::NException::fg_Try
-							(
-								[&] ()
-								{
-									if (bThrowException)
-										throw int(30);
-								}
-							)
-							.f_Catch<int>
-							(
-								[&] (int _Exception)
-								{
-									bExceptionCaught = true;
-								}
-							)
-							.f_Catch<float>
-							(
-								[&] (float _Exception)
-								{
-									bExceptionCaught = true;
-								}
-							)
-							.f_Execute();
+								(
+									[&]()
+									{
+										if (bThrowException)
+											throw int(30);
+									}
+								)
+								.f_Catch<int>
+								(
+									[&](int _Exception)
+									{
+										bExceptionCaught = true;
+									}
+								)
+								.f_Catch<float>
+								(
+									[&](float _Exception)
+									{
+										bExceptionCaught = true;
+									}
+								)
+								.f_Execute()
+							;
 						}
 						ExceptionsLambdaTime.f_Stop();
 					}
@@ -168,9 +167,9 @@ namespace
 						NoExceptionsTime.f_Stop();
 					}
 
-
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false) && DMibExpr(2));
-/*					ExceptionsLambdaTime /= 10000;
+					/*
+					ExceptionsLambdaTime /= 10000;
 					ExceptionsTime /= 10000;
 					NoExceptionsTime /= 10000;
 					DMibTest(DMibExpr(ExceptionsLambdaTime) / DMibExpr(ExceptionsTime) >= DMibExpr(1.0));
@@ -179,82 +178,85 @@ namespace
 				{
 					bool bExceptionCaught = false;
 					NMib::NException::fg_Try
-					(
-						[&] ()
-						{
-							throw int(30);
-						}
-					)
-					.f_Catch<int>
-					(
-						[&] (int _Exception)
-						{
-							bExceptionCaught = true;
-							//DMibTrace("{}\r\n", _Exception);
-		//					throw;
-						}
-					).f_Execute();
-
+						(
+							[&]()
+							{
+								throw int(30);
+							}
+						)
+						.f_Catch<int>
+						(
+							[&](int _Exception)
+							{
+								bExceptionCaught = true;
+								// DMibTrace("{}\r\n", _Exception);
+								// throw;
+							}
+						)
+						.f_Execute()
+					;
 
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true));
 				}
 				{
 					bool bExceptionCaught = false;
 					NMib::NException::fg_Try
-					(
-						[&] ()
-						{
-							throw float(30);
-						}
-					)
-					.f_Catch<int>
-					(
-						[&] (int _Exception)
-						{
-							bExceptionCaught = true;
-							//DMibTrace("{}\r\n", _Exception);
-		//					throw;
-						}
-					)
-					.f_Catch<float>
-					(
-						[&] (float _Exception)
-						{
-							bExceptionCaught = true;
-							//DMibTrace("{}\r\n", _Exception);
-		//					throw;
-						}
-					).f_Execute();
-
+						(
+							[&]()
+							{
+								throw float(30);
+							}
+						)
+						.f_Catch<int>
+						(
+							[&](int _Exception)
+							{
+								bExceptionCaught = true;
+								// DMibTrace("{}\r\n", _Exception);
+								// throw;
+							}
+						)
+						.f_Catch<float>
+						(
+							[&](float _Exception)
+							{
+								bExceptionCaught = true;
+								// DMibTrace("{}\r\n", _Exception);
+								// throw;
+							}
+						)
+						.f_Execute()
+					;
 
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true) && DMibExpr(2));
 				}
 				{
 					int ExceptionCaught = false;
 					NMib::NException::fg_Try
-					(
-						[&] ()
-						{
-							throw int(30);
-						}
-					)
-					.f_Catch<int>
-					(
-						[&] (int _Exception)
-						{
-							++ExceptionCaught;
-							throw;
-						}
-					)
-					.f_Catch<int>
-					(
-						[&] (int _Exception)
-						{
-							++ExceptionCaught;
-							//throw;
-						}
-					).f_Execute();
-
+						(
+							[&]()
+							{
+								throw int(30);
+							}
+						)
+						.f_Catch<int>
+						(
+							[&](int _Exception)
+							{
+								++ExceptionCaught;
+								throw;
+							}
+						)
+						.f_Catch<int>
+						(
+							[&](int _Exception)
+							{
+								++ExceptionCaught;
+								//throw;
+							}
+						)
+						.f_Execute()
+					;
 
 					DMibTest(DMibExpr(ExceptionCaught) == DMibExpr(2));
 				}
@@ -279,7 +281,6 @@ namespace
 				TCAsyncResult<int> NewResult = Result;
 
 				DMibExpectException(NewResult.f_Get(), DMibErrorInstance("Test"));
-
 			};
 			DMibTestSuite(CTestCategory("GetExceptionString") << CTestGroup("Performance"))
 			{
@@ -298,12 +299,11 @@ namespace
 					{
 						Measure.f_Start();
 						[&]() inline_never
-							{
-								for (umint i = 0; i < nTests; ++i)
-									Result.f_GetExceptionStr();
-							}
-							()
-						;
+						{
+							for (umint i = 0; i < nTests; ++i)
+								Result.f_GetExceptionStr();
+						}
+						();
 						Measure.f_Stop(nTests);
 					}
 					PerfTotal.f_Add(Measure);

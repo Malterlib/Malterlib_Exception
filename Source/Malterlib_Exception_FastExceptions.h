@@ -4,7 +4,7 @@
 #pragma once
 
 #if defined(DMalterlibLibCxxABI) && __has_feature(cxx_rtti)
-	#define DMibHasFastExceptions
+#	define DMibHasFastExceptions
 #endif
 
 namespace NMib::NException
