@@ -9,7 +9,6 @@ Checks: >-
   -malterlib-struct-not-class,
   -malterlib-variable-naming,
   -malterlib-parameter-naming,
-  -malterlib-conceptual-prefix,
-  -malterlib-macro-naming
+  -malterlib-conceptual-prefix
 CheckOptions:
   malterlib.OptionsFile: ../Core/ClangTidyOptions.yaml

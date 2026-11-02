@@ -423,10 +423,10 @@ namespace NMib::NException
 
 	DMibImpErrorClassDefine(CExceptionMemory, CException);
 
-#define DMibErrorMemory(_Description) DMibImpError(NMib::NException::CExceptionMemory, _Description)
+#define DMibErrorMemory(d_Description) DMibImpError(NMib::NException::CExceptionMemory, d_Description)
 
 #ifndef DMibPNoShortCuts
-#	define DErrorMemory(_Description) DMibErrorMemory(_Description)
+#	define DErrorMemory(d_Description) DMibErrorMemory(d_Description)
 #endif
 
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
@@ -434,10 +434,10 @@ namespace NMib::NException
 	\*_____________________________________________________________________________*/
 
 	DMibImpErrorClassDefine(CExceptionSystemImplementation, CException);
-#define DMibErrorSystemImp(_Description) DMibImpError(NMib::NException::CExceptionSystemImplementation, _Description)
+#define DMibErrorSystemImp(d_Description) DMibImpError(NMib::NException::CExceptionSystemImplementation, d_Description)
 
 #ifndef DMibPNoShortCuts
-#	define DErrorSystemImp(_Description) DMibErrorSystemImp(_Description)
+#	define DErrorSystemImp(d_Description) DMibErrorSystemImp(d_Description)
 #endif
 
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
@@ -445,10 +445,10 @@ namespace NMib::NException
 	\*_____________________________________________________________________________*/
 
 	DMibImpErrorClassDefine(CExceptionPureCall, CException);
-#define DMibErrorPureCall(_Description) DMibImpError(NMib::NException::CExceptionPureCall, _Description)
+#define DMibErrorPureCall(d_Description) DMibImpError(NMib::NException::CExceptionPureCall, d_Description)
 
 #ifndef DMibPNoShortCuts
-#	define DErrorPureCall(_Description) DMibErrorPureCall(_Description)
+#	define DErrorPureCall(d_Description) DMibErrorPureCall(d_Description)
 #endif
 
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
@@ -456,10 +456,10 @@ namespace NMib::NException
 	\*_____________________________________________________________________________*/
 
 	DMibImpErrorClassDefine(CExceptionBadFunctionCall, CException);
-#define DMibErrorBadFunctionCall(_Description) DMibImpError(NMib::NException::CExceptionBadFunctionCall, _Description)
+#define DMibErrorBadFunctionCall(d_Description) DMibImpError(NMib::NException::CExceptionBadFunctionCall, d_Description)
 
 #ifndef DMibPNoShortCuts
-#	define DErrorBadFunctionCall(_Description) DMibErrorBadFunctionCall(_Description)
+#	define DErrorBadFunctionCall(d_Description) DMibErrorBadFunctionCall(d_Description)
 #endif
 
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
@@ -468,12 +468,12 @@ namespace NMib::NException
 
 #if DMibEnableSafeCheck > 0
 	DMibImpErrorClassDefine(CExceptionSafeCheck, CDebugException);
-#	define DMibErrorSafeCheck(_Description) DMibImpError(NMib::NException::CExceptionSafeCheck, _Description)
-#	define DMibErrorInstanceSafeCheck(_Description) DMibImpExceptionInstance(NMib::NException::CExceptionSafeCheck, _Description)
+#	define DMibErrorSafeCheck(d_Description) DMibImpError(NMib::NException::CExceptionSafeCheck, d_Description)
+#	define DMibErrorInstanceSafeCheck(d_Description) DMibImpExceptionInstance(NMib::NException::CExceptionSafeCheck, d_Description)
 
 #	ifndef DMibPNoShortCuts
-#		define DErrorSafeCheck(_Description) DMibErrorSafeCheck(_Description)
-#		define DErrorInstanceSafeCheck(_Description) DMibErrorInstanceSafeCheck(_Description)
+#		define DErrorSafeCheck(d_Description) DMibErrorSafeCheck(d_Description)
+#		define DErrorInstanceSafeCheck(d_Description) DMibErrorInstanceSafeCheck(d_Description)
 #	endif
 #endif
 }
@@ -482,10 +482,10 @@ namespace NMib::NFile
 {
 	DMibImpErrorClassDefine(CExceptionFile, NException::CException);
 
-#define DMibErrorFile(_Description) DMibImpError(NMib::NFile::CExceptionFile, _Description)
+#define DMibErrorFile(d_Description) DMibImpError(NMib::NFile::CExceptionFile, d_Description)
 
 #ifndef DMibPNoShortCuts
-#	define DErrorFile(_Description) DMibErrorFile(_Description)
+#	define DErrorFile(d_Description) DMibErrorFile(d_Description)
 #endif
 }
 

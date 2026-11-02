@@ -134,7 +134,7 @@ namespace
 				constexpr umint c_nExceptions = 100000;
 #endif
 
-#define DMibErrorInstanceMemory(_Description) DMibImpExceptionInstance(NMib::NException::CExceptionMemory, _Description)
+#define DMibErrorInstanceMemory(d_Description) DMibImpExceptionInstance(NMib::NException::CExceptionMemory, d_Description)
 
 				auto pException = fg_MakeException(DMibErrorInstanceMemory("Test exception"));
 
