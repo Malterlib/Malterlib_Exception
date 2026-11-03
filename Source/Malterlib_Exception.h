@@ -20,7 +20,7 @@ namespace NMib::NException
 {
 	using CExceptionPointer = std::exception_ptr;
 
-	class CDisableExceptionFilterScope;
+	struct CDisableExceptionFilterScope;
 
 	inline_always int fg_UncaughtExceptions()
 	{
@@ -37,11 +37,11 @@ namespace NMib::NException
 //#define DMibExceptionTraceEnable
 //#endif
 
-	class CNormalExceptionTag
+	struct CNormalExceptionTag
 	{
 	};
 
-	class CDebugExceptionTag
+	struct CDebugExceptionTag
 	{
 	};
 
@@ -78,26 +78,8 @@ namespace NMib::NException
 		}
 	inline constexpr uint32 gc_ExceptionDataStreamVersion<t_CData> = t_CData::mc_StreamVersion;
 
-	class CExceptionBase
+	struct CExceptionBase
 	{
-		static uint32 const mcp_Magic = 0xE538CB10;
-		uint32 m_Magic;
-		ch8 const *m_pClass;
-		ch8 const *m_pFile;
-		ch8 const *m_pFunction;
-		int32 m_Line;
-		ch8 m_ErrorNoAlloc[128];
-		NStorage::TCUniquePointer<NStr::CStr> m_pErrorAlloc;
-		NStorage::TCUniquePointer<NStr::CStrNonTracked, NMemory::CAllocator_NonTrackedHeap> m_pErrorAllocNonTracked;
-		NStorage::TCUniquePointer<CCallstack> m_pCallstack;
-		NStorage::TCUniquePointer<CCallstack, NMemory::CAllocator_NonTrackedHeap> m_pCallstackNonTracked;
-		uint32 m_TypeHash;
-
-		void fp_Construct(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
-		void fp_ConstructNonTracked(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
-		void fp_Copy(CExceptionBase const &_Other);
-
-	public:
 		static constexpr uint32 mc_StreamVersion = 0; // See gc_ExceptionDataStreamVersion
 
 		// If this exception could cause errors with memory management, keep it shorter than 127 characters so it fits in
@@ -147,6 +129,24 @@ namespace NMib::NException
 		template <typename tf_CStream>
 		void f_Consume(tf_CStream &_Stream);
 #endif
+
+	private:
+		static uint32 const mcp_Magic = 0xE538CB10;
+		uint32 m_Magic;
+		ch8 const *m_pClass;
+		ch8 const *m_pFile;
+		ch8 const *m_pFunction;
+		int32 m_Line;
+		ch8 m_ErrorNoAlloc[128];
+		NStorage::TCUniquePointer<NStr::CStr> m_pErrorAlloc;
+		NStorage::TCUniquePointer<NStr::CStrNonTracked, NMemory::CAllocator_NonTrackedHeap> m_pErrorAllocNonTracked;
+		NStorage::TCUniquePointer<CCallstack> m_pCallstack;
+		NStorage::TCUniquePointer<CCallstack, NMemory::CAllocator_NonTrackedHeap> m_pCallstackNonTracked;
+		uint32 m_TypeHash;
+
+		void fp_Construct(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
+		void fp_ConstructNonTracked(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
+		void fp_Copy(CExceptionBase const &_Other);
 	};
 
 	template <typename t_CException>
@@ -175,9 +175,8 @@ namespace NMib::NException
 #	define DMibImpErrorClass_TypeRegistry(d_CClass)
 #endif
 
-	class CException : public CExceptionBase
+	struct CException : public CExceptionBase
 	{
-	public:
 		template <typename t_CError>
 		CException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
 			: CExceptionBase(_pClass ? _pClass : "CException", _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
@@ -204,9 +203,8 @@ namespace NMib::NException
 	extern template CExceptionPointer fg_ExceptionPointer<CException &&>(CException &&_Exception);
 
 #ifdef DMibNeedDebugException
-	class CDebugException : public CExceptionBase
+	struct CDebugException : public CExceptionBase
 	{
-	public:
 		template <typename t_CError>
 		CDebugException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
 			: CExceptionBase(_pClass ? _pClass : "CDebugException", _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
@@ -290,9 +288,8 @@ namespace NMib::NException
 #endif
 
 #define DMibImpErrorClassDefine(d_CClass, d_CParent) \
-	class d_CClass : public d_CParent\
+	struct d_CClass : public d_CParent\
 	{\
-	public:\
 		template <typename t_CError>\
 		d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
 			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
@@ -337,8 +334,9 @@ namespace NMib::NException
 	}
 
 #define DMibImpErrorSpecificClassDefine(d_CClass, d_CParent, d_CSpecificType) \
-	class d_CClass : public d_CParent\
+	struct d_CClass : public d_CParent\
 	{\
+	private:\
 		d_CSpecificType m_SpecificData;\
 	public:\
 		template <typename t_CError>\
@@ -384,9 +382,8 @@ namespace NMib::NException
 	};
 
 #define DMibImpErrorSpecificClassParentDefine(d_CClass, d_CParent, d_CSpecificType) \
-	class d_CClass : public d_CParent\
+	struct d_CClass : public d_CParent\
 	{\
-	public:\
 		template <typename t_CError>\
 		d_CClass\
 			(\

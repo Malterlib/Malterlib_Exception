@@ -14,9 +14,8 @@
 namespace NMib::NException
 {
 	template <typename t_CCatch, typename t_CLambda, typename t_CParent>
-	class TCExceptionalCatch : public t_CParent
+	struct TCExceptionalCatch : public t_CParent
 	{
-	public:
 		t_CLambda m_Lambda;
 		inline_always TCExceptionalCatch(t_CLambda _Lambda, t_CParent _Parent)
 			: t_CParent(_Parent)
@@ -44,9 +43,8 @@ namespace NMib::NException
 	};
 
 	template <typename t_CLambda>
-	class TCExceptional
+	struct TCExceptional
 	{
-	public:
 		t_CLambda m_Lambda;
 		inline_always TCExceptional(t_CLambda _Lambda)
 			: m_Lambda(_Lambda)
@@ -85,9 +83,8 @@ namespace
 {
 	using namespace NMib::NConcurrency;
 
-	class CExceptions_Tests : public NMib::NTest::CTest
+	struct CExceptions_Tests : public NMib::NTest::CTest
 	{
-	public:
 		void f_DoTests()
 		{
 			// << CTestGroup("Unfinished")

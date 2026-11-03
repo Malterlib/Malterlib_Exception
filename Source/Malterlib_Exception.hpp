@@ -118,7 +118,7 @@ namespace NMib::NException
 #define DMibErrorWrapped(d_Description, d_Specific, ...) DMibImpErrorSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific, ##__VA_ARGS__)
 #define DMibErrorInstanceWrapped(d_Description, d_Specific, ...) DMibImpExceptionInstanceSpecific(NMib::NException::CExceptionWrapped, d_Description, d_Specific, ##__VA_ARGS__)
 
-	class CExceptionExceptionVector;
+	struct CExceptionExceptionVector;
 	struct CExceptionExceptionVectorData
 	{
 		CExceptionExceptionVectorData() = default;
@@ -206,9 +206,8 @@ namespace NMib::NException
 namespace NMib::NStream
 {
 	template <typename t_CStream>
-	class TCBinaryStreamTypeReference<t_CStream, NException::CStreamableExceptionPointer>
+	struct TCBinaryStreamTypeReference<t_CStream, NException::CStreamableExceptionPointer>
 	{
-	public:
 		static void fs_Feed(t_CStream &_Stream, NException::CStreamableExceptionPointer const &_Data)
 		{
 			NConcurrency::NPrivate::fg_FeedException(_Stream, _Data.m_pException, _Data.m_bVersioned);
@@ -226,9 +225,8 @@ namespace NMib::NStream
 	// as its _bVersioned, or to NConcurrency::NPrivate::fg_FeedException and fg_ConsumeException like CExceptionWrappedData::f_Stream.
 	// Distributed actor calls stream their exceptions with the protocol version and need neither.
 	template <typename t_CStream>
-	class TCBinaryStreamTypeReference<t_CStream, NException::CExceptionPointer>
+	struct TCBinaryStreamTypeReference<t_CStream, NException::CExceptionPointer>
 	{
-	public:
 		template <typename tf_CData>
 		static void fs_Feed(t_CStream &_Stream, tf_CData &&_Data)
 		{

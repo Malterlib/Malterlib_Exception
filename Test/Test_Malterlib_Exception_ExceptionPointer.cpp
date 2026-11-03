@@ -40,9 +40,8 @@ namespace
 		return false;
 	}
 
-	class CExceptionPointer_Tests : public CTest
+	struct CExceptionPointer_Tests : public CTest
 	{
-	public:
 		void f_DoTests()
 		{
 			DMibTestSuite("FastExceptionPointerRegression")
