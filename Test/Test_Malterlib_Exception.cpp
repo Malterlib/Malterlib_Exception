@@ -23,10 +23,10 @@ namespace NMib::NException
 		{
 		}
 
-		template <typename t_CCatch2, typename t_CLambda2>
-		inline_always TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptionalCatch> f_Catch(t_CLambda2 _Lambda) const
+		template <typename tf_CCatch, typename tf_CLambda>
+		inline_always TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptionalCatch> f_Catch(tf_CLambda _Lambda) const
 		{
-			return TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptionalCatch>(_Lambda, *this);
+			return TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptionalCatch>(_Lambda, *this);
 		}
 
 		inline_always void f_Execute() const
@@ -51,10 +51,10 @@ namespace NMib::NException
 		{
 		}
 
-		template <typename t_CCatch2, typename t_CLambda2>
-		inline_always TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptional> f_Catch(t_CLambda2 _Lambda) const
+		template <typename tf_CCatch, typename tf_CLambda>
+		inline_always TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptional> f_Catch(tf_CLambda _Lambda) const
 		{
-			return TCExceptionalCatch<t_CCatch2, t_CLambda2, TCExceptional>(_Lambda, *this);
+			return TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptional>(_Lambda, *this);
 		}
 
 		inline_always void f_Execute() const
@@ -63,14 +63,14 @@ namespace NMib::NException
 		}
 	};
 
-	template <typename t_CLambda>
-	inline_always TCExceptional<t_CLambda> fg_Try(t_CLambda const &_Lambda)
+	template <typename tf_CLambda>
+	inline_always TCExceptional<tf_CLambda> fg_Try(tf_CLambda const &_Lambda)
 	{
-		return TCExceptional<t_CLambda>(_Lambda);
+		return TCExceptional<tf_CLambda>(_Lambda);
 	}
 
-	template <typename t_CExceptional>
-	inline_always void fg_Execute(t_CExceptional const &_Lambda)
+	template <typename tf_CExceptional>
+	inline_always void fg_Execute(tf_CExceptional const &_Lambda)
 	{
 		_Lambda.f_Execute();
 	}

@@ -7,7 +7,7 @@
 extern "C"
 {
 	void *__cxa_allocate_exception(size_t thrown_size) throw();
-	void __cxa_make_exception_ptr(void *thrown_object, std::type_info const *tinfo, void (*dest)(void *));
+	void __cxa_make_exception_ptr(void *thrown_object, std::type_info const *tinfo, void (*dest)(void *_pThrownObject));
 	bool __cxa_can_catch(void *thrown_object, std::type_info const *tinfo);
 }
 #endif
@@ -87,7 +87,7 @@ namespace NMib::NException
 		// already suspended is broken (crashes in Release, works in Debug because nothing
 		// inlines). Keeping the try/catch in its own ordinary stack frame avoids it.
 		template <typename tf_FOnValid>
-		inline_never_coro_exception_workaround bool fg_VisitExceptionHelper(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid, NMeta::TCTypeList<>)
+		inline_never_coro_exception_workaround bool fg_VisitExceptionHelper(CExceptionPointer const &_pException, tf_FOnValid &&_fOnValid, NMeta::TCTypeList<> _Exceptions)
 		{
 			std::rethrow_exception(_pException);
 			return false;
@@ -98,7 +98,7 @@ namespace NMib::NException
 			(
 				CExceptionPointer const &_pException
 				, tf_FOnValid &&_fOnValid
-				, NMeta::TCTypeList<tf_CFirstException, tfp_CExceptions...>
+				, NMeta::TCTypeList<tf_CFirstException, tfp_CExceptions...> _Exceptions
 			)
 			-> bool
 		{

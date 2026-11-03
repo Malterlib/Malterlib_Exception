@@ -54,7 +54,7 @@ namespace
 				bVisitedEmptyException = fg_VisitException<CExceptionBase>
 					(
 						pEmptyException
-						, [&](auto &&)
+						, [&](auto &&_Exception)
 						{
 							bVisitedEmptyException = true;
 						}
@@ -75,7 +75,7 @@ namespace
 					bVisitedMovedFromException = fg_VisitException<CExceptionBase>
 						(
 							pException
-							, [&](auto &&)
+							, [&](auto &&_Exception)
 							{
 								bVisitedMovedFromException = true;
 							}

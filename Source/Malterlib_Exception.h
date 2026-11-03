@@ -88,8 +88,8 @@ namespace NMib::NException
 		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::CStrNonTracked const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 
-		template <typename t_CError>
-		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::TCStr<t_CError> const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
+		template <typename tf_CError>
+		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::TCStr<tf_CError> const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 
 		CExceptionBase(CExceptionBase const &_Other);
 		CExceptionBase &operator = (CExceptionBase const &_Other);
@@ -110,12 +110,12 @@ namespace NMib::NException
 
 		bool operator == (CExceptionBase const &_Other) const noexcept;
 
-		template <typename t_CFormatter>
-		int f_GetStringFormatType(t_CFormatter &_Formatter);
-		template <typename t_CFormatter>
+		template <typename tf_CFormatter>
+		int f_GetStringFormatType(tf_CFormatter &_Formatter);
+		template <typename tf_CFormatter>
 		// This crashes GCC
-		// auto f_CreateStringFormatter(t_CFormatter &_Formatter) const -> decltype(NStr::fg_CreateStringFormatter(_Formatter, ""))
-		NStr::CStrFormatTypeClassifier_String f_CreateStringFormatter(t_CFormatter &_Formatter) const;
+		// auto f_CreateStringFormatter(tf_CFormatter &_Formatter) const -> decltype(NStr::fg_CreateStringFormatter(_Formatter, ""))
+		NStr::CStrFormatTypeClassifier_String f_CreateStringFormatter(tf_CFormatter &_Formatter) const;
 
 		inline_always_debug uint32 f_TypeHash() const;
 
@@ -177,16 +177,16 @@ namespace NMib::NException
 
 	struct CException : public CExceptionBase
 	{
-		template <typename t_CError>
-		CException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CException", _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+		template <typename tf_CError>
+		CException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
+			: CExceptionBase(_pClass ? _pClass : "CException", _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
 		{
 			fp_RegisterTypeRegistry();
 		}
 
-		template <typename t_CError>
-		CException(ch8 const *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CException", "", 0, "", fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+		template <typename tf_CError>
+		CException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
+			: CExceptionBase(_pClass ? _pClass : "CException", "", 0, "", fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
 		{
 			fp_RegisterTypeRegistry();
 		}
@@ -205,16 +205,16 @@ namespace NMib::NException
 #ifdef DMibNeedDebugException
 	struct CDebugException : public CExceptionBase
 	{
-		template <typename t_CError>
-		CDebugException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CDebugException", _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+		template <typename tf_CError>
+		CDebugException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
+			: CExceptionBase(_pClass ? _pClass : "CDebugException", _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
 		{
 			fp_RegisterTypeRegistry();
 		}
 
-		template <typename t_CError>
-		CDebugException(ch8 const *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CDebugException", "", 0, "", fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+		template <typename tf_CError>
+		CDebugException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
+			: CExceptionBase(_pClass ? _pClass : "CDebugException", "", 0, "", fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
 		{
 			fp_RegisterTypeRegistry();
 		}
@@ -290,15 +290,15 @@ namespace NMib::NException
 #define DMibImpErrorClassDefine(d_CClass, d_CParent) \
 	struct d_CClass : public d_CParent\
 	{\
-		template <typename t_CError>\
-		d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
-			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+		template <typename tf_CError>\
+		d_CClass(const ch8 *_pClass, const ch8 *_pFile, aint _Line, const ch8 *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 		{\
 			fp_RegisterTypeRegistry();\
 		}\
-		template <typename t_CError>\
-		d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
-			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+		template <typename tf_CError>\
+		d_CClass(const ch8 *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 		{\
 			fp_RegisterTypeRegistry();\
 		}\
@@ -339,27 +339,27 @@ namespace NMib::NException
 	private:\
 		d_CSpecificType m_SpecificData;\
 	public:\
-		template <typename t_CError>\
+		template <typename tf_CError>\
 		d_CClass\
 			(\
 				ch8 const *_pClass\
 				, ch8 const *_pFile\
 				, aint _Line\
 				, ch8 const *_pFunction\
-				, t_CError &&_Error\
+				, tf_CError &&_Error\
 				, bool _bTrace\
 				, d_CSpecificType const &_SpecificData = fg_Default()\
 				, bool _bStackTrace = true\
 				, uint32 _TypeHash = ms_TypeHash\
 			)\
-			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 			, m_SpecificData(_SpecificData)\
 		{\
 			fp_RegisterTypeRegistry();\
 		}\
-		template <typename t_CError>\
-		d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
-			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
+		template <typename tf_CError>\
+		d_CClass(const ch8 *_pClass, tf_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
 			, m_SpecificData(_SpecificData)\
 		{\
 			fp_RegisterTypeRegistry();\
@@ -384,26 +384,26 @@ namespace NMib::NException
 #define DMibImpErrorSpecificClassParentDefine(d_CClass, d_CParent, d_CSpecificType) \
 	struct d_CClass : public d_CParent\
 	{\
-		template <typename t_CError>\
+		template <typename tf_CError>\
 		d_CClass\
 			(\
 				ch8 const *_pClass\
 				, ch8 const *_pFile\
 				, aint _Line\
 				, ch8 const *_pFunction\
-				, t_CError &&_Error\
+				, tf_CError &&_Error\
 				, bool _bTrace\
 				, d_CSpecificType const &_SpecificData = fg_Default()\
 				, bool _bStackTrace = true\
 				, uint32 _TypeHash = ms_TypeHash\
 			)\
-			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<t_CError>(_Error), _bTrace, _SpecificData, _bStackTrace, _TypeHash)\
+			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _SpecificData, _bStackTrace, _TypeHash)\
 		{\
 			fp_RegisterTypeRegistry();\
 		}\
-		template <typename t_CError>\
-		d_CClass(const ch8 *_pClass, t_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
-			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<t_CError>(_Error), _bTrace, _SpecificData, _bStackTrace, _TypeHash)\
+		template <typename tf_CError>\
+		d_CClass(const ch8 *_pClass, tf_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
+			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<tf_CError>(_Error), _bTrace, _SpecificData, _bStackTrace, _TypeHash)\
 		{\
 			fp_RegisterTypeRegistry();\
 		}\

@@ -13,22 +13,22 @@ namespace NMib::NConcurrency::NPrivate
 
 namespace NMib::NException
 {
-	template <typename t_CFormatter>
+	template <typename tf_CFormatter>
 	// This crashes GCC
-	// auto f_CreateStringFormatter(t_CFormatter &_Formatter) const -> decltype(NStr::fg_CreateStringFormatter(_Formatter, ""))
-	NStr::CStrFormatTypeClassifier_String CExceptionBase::f_CreateStringFormatter(t_CFormatter &_Formatter) const
+	// auto f_CreateStringFormatter(tf_CFormatter &_Formatter) const -> decltype(NStr::fg_CreateStringFormatter(_Formatter, ""))
+	NStr::CStrFormatTypeClassifier_String CExceptionBase::f_CreateStringFormatter(tf_CFormatter &_Formatter) const
 	{
 		return NStr::fg_CreateStringFormatter(_Formatter, fg_ByValue(f_GetErrorStr()));
 	}
 
-	template <typename t_CError>
+	template <typename tf_CError>
 	CExceptionBase::CExceptionBase
 		(
 			ch8 const *_pClass
 			, ch8 const *_pFile
 			, aint _Line
 			, ch8 const *_pFunction
-			, NStr::TCStr<t_CError> const &_Error
+			, NStr::TCStr<tf_CError> const &_Error
 			, bool _bTrace
 			, bool _bStackTrace
 			, uint32 _TypeHash
@@ -40,7 +40,7 @@ namespace NMib::NException
 		, m_Line(_Line)
 		, m_TypeHash(_TypeHash)
 	{
-		if constexpr (NTraits::cIsSame<typename t_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator> || !NStr::TCStr<t_CError>::mc_AllocatesMemory)
+		if constexpr (NTraits::cIsSame<typename tf_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator> || !NStr::TCStr<tf_CError>::mc_AllocatesMemory)
 			fp_ConstructNonTracked(_Error.f_GetStr(), _bTrace, _bStackTrace);
 		else
 			fp_Construct(_Error.f_GetStr(), _bTrace, _bStackTrace);
