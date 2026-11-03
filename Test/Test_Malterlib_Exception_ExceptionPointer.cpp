@@ -97,24 +97,24 @@ namespace
 				CTestPerformanceMeasure MalterlibTime("Malterlib");
 				CTestPerformanceMeasure StdTime("Std");
 
-				for (umint i = 0; i < c_nTests; ++i)
+				for (umint iTest = 0; iTest < c_nTests; ++iTest)
 				{
 					DMibTestScopeMeasure(SharedPtrTime, c_nExceptions);
-					for (umint i = 0; i < c_nExceptions; ++i)
+					for (umint iException = 0; iException < c_nExceptions; ++iException)
 						[[maybe_unused]] TCSharedPointer<CException> pException = fg_Construct("CException", DMibPFile, DMibPLine, DMibPFunction, "Test", false);
 				}
 
-				for (umint i = 0; i < c_nTests; ++i)
+				for (umint iTest = 0; iTest < c_nTests; ++iTest)
 				{
 					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
-					for (umint i = 0; i < c_nExceptions; ++i)
+					for (umint iException = 0; iException < c_nExceptions; ++iException)
 						[[maybe_unused]] auto pTest = fg_MakeException(DMibErrorInstance("Test"));
 				}
 
-				for (umint i = 0; i < c_nTests; ++i)
+				for (umint iTest = 0; iTest < c_nTests; ++iTest)
 				{
 					DMibTestScopeMeasure(StdTime, c_nExceptions);
-					for (umint i = 0; i < c_nExceptions; ++i)
+					for (umint iException = 0; iException < c_nExceptions; ++iException)
 						[[maybe_unused]] auto pTest = std::make_exception_ptr(DMibErrorInstance("Test"));
 				}
 
@@ -140,10 +140,10 @@ namespace
 				CTestPerformanceMeasure DirectTime("Direct");
 				CTestPerformanceMeasure MalterlibTime("Malterlib");
 
-				for (umint i = 0; i < c_nTests; ++i)
+				for (umint iTest = 0; iTest < c_nTests; ++iTest)
 				{
 					DMibTestScopeMeasure(DirectTime, c_nExceptions);
-					for (umint i = 0; i < c_nExceptions; ++i)
+					for (umint iException = 0; iException < c_nExceptions; ++iException)
 					{
 						fg_VisitExceptionDirect
 							(
@@ -156,10 +156,10 @@ namespace
 					}
 				}
 
-				for (umint i = 0; i < c_nTests; ++i)
+				for (umint iTest = 0; iTest < c_nTests; ++iTest)
 				{
 					DMibTestScopeMeasure(MalterlibTime, c_nExceptions);
-					for (umint i = 0; i < c_nExceptions; ++i)
+					for (umint iException = 0; iException < c_nExceptions; ++iException)
 					{
 						fg_VisitException<NException::CExceptionPureCall, NException::CExceptionMemory, NException::CException>
 							(

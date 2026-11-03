@@ -97,10 +97,10 @@ namespace
 					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsLambdaTime;
 					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsTime;
 					NMib::NTime::CPrefCyclesTimeMeasureMin NoExceptionsTime;
-					for (umint i = 0; i < 10; ++i)
+					for (umint iRun = 0; iRun < 10; ++iRun)
 					{
 						ExceptionsLambdaTime.f_Start();
-						for (umint i = 0; i < 10000; ++i)
+						for (umint iIteration = 0; iIteration < 10000; ++iIteration)
 						{
 							NMib::NException::fg_Try
 								(
@@ -131,10 +131,10 @@ namespace
 					}
 					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false));
 
-					for (umint i = 0; i < 10; ++i)
+					for (umint iRun = 0; iRun < 10; ++iRun)
 					{
 						ExceptionsTime.f_Start();
-						for (umint i = 0; i < 10000; ++i)
+						for (umint iIteration = 0; iIteration < 10000; ++iIteration)
 						{
 							try
 							{
@@ -153,10 +153,10 @@ namespace
 						ExceptionsTime.f_Stop();
 					}
 
-					for (umint i = 0; i < 10; ++i)
+					for (umint iRun = 0; iRun < 10; ++iRun)
 					{
 						NoExceptionsTime.f_Start();
-						for (umint i = 0; i < 10000; ++i)
+						for (umint iIteration = 0; iIteration < 10000; ++iIteration)
 						{
 							if (bThrowException)
 								throw int(30);
@@ -292,12 +292,12 @@ namespace
 				Result.f_SetException(fg_MakeException(DMibErrorInstance("Test error")));
 				{
 					CTestPerformanceMeasure Measure("Malterlib");
-					for (umint i = 0; i < nIterations; ++i)
+					for (umint iIteration = 0; iIteration < nIterations; ++iIteration)
 					{
 						Measure.f_Start();
 						[&]() inline_never
 						{
-							for (umint i = 0; i < nTests; ++i)
+							for (umint iTest = 0; iTest < nTests; ++iTest)
 								Result.f_GetExceptionStr();
 						}
 						();

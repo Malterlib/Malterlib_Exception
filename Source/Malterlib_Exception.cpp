@@ -101,48 +101,48 @@ namespace NMib::NException
 
 	CExceptionBase &CExceptionBase::operator = (CExceptionBase const &_Other)
 	{
-		m_Magic = mcp_Magic;
-		m_pClass = _Other.m_pClass;
-		m_pFile = _Other.m_pFile;
-		m_pFunction = _Other.m_pFunction;
-		m_Line = _Other.m_Line;
-		m_pErrorAlloc.f_Clear();
-		m_pErrorAllocNonTracked.f_Clear();
-		m_pCallstack.f_Clear();
-		m_pCallstackNonTracked.f_Clear();
-		m_TypeHash = _Other.m_TypeHash;
+		mp_Magic = mcp_Magic;
+		mp_pClass = _Other.mp_pClass;
+		mp_pFile = _Other.mp_pFile;
+		mp_pFunction = _Other.mp_pFunction;
+		mp_Line = _Other.mp_Line;
+		mp_pErrorAlloc.f_Clear();
+		mp_pErrorAllocNonTracked.f_Clear();
+		mp_pCallstack.f_Clear();
+		mp_pCallstackNonTracked.f_Clear();
+		mp_TypeHash = _Other.mp_TypeHash;
 		fp_Copy(_Other);
 		return *this;
 	}
 
 	void CExceptionBase::fp_Copy(CExceptionBase const &_Other)
 	{
-		if (_Other.m_pErrorAlloc)
+		if (_Other.mp_pErrorAlloc)
 		{
-			m_pErrorAlloc = fg_Copy(_Other.m_pErrorAlloc);
-			m_ErrorNoAlloc[0] = 0;
+			mp_pErrorAlloc = fg_Copy(_Other.mp_pErrorAlloc);
+			mp_ErrorNoAlloc[0] = 0;
 		}
-		else if (_Other.m_pErrorAllocNonTracked)
+		else if (_Other.mp_pErrorAllocNonTracked)
 		{
-			m_pErrorAllocNonTracked = fg_Copy(_Other.m_pErrorAllocNonTracked);
-			m_ErrorNoAlloc[0] = 0;
+			mp_pErrorAllocNonTracked = fg_Copy(_Other.mp_pErrorAllocNonTracked);
+			mp_ErrorNoAlloc[0] = 0;
 		}
 		else
-			NStr::fg_StrCopy(m_ErrorNoAlloc, _Other.m_ErrorNoAlloc, 128);
+			NStr::fg_StrCopy(mp_ErrorNoAlloc, _Other.mp_ErrorNoAlloc, 128);
 
-		if (_Other.m_pCallstack)
-			m_pCallstack = fg_Copy(_Other.m_pCallstack);
-		else if (_Other.m_pCallstackNonTracked)
-			m_pCallstackNonTracked = fg_Copy(_Other.m_pCallstackNonTracked);
+		if (_Other.mp_pCallstack)
+			mp_pCallstack = fg_Copy(_Other.mp_pCallstack);
+		else if (_Other.mp_pCallstackNonTracked)
+			mp_pCallstackNonTracked = fg_Copy(_Other.mp_pCallstackNonTracked);
 	}
 
 	CExceptionBase::CExceptionBase(CExceptionBase const &_Other)
-		: m_Magic(mcp_Magic)
-		, m_pClass(_Other.m_pClass)
-		, m_pFile(_Other.m_pFile)
-		, m_pFunction(_Other.m_pFunction)
-		, m_Line(_Other.m_Line)
-		, m_TypeHash(_Other.m_TypeHash)
+		: mp_Magic(mcp_Magic)
+		, mp_pClass(_Other.mp_pClass)
+		, mp_pFile(_Other.mp_pFile)
+		, mp_pFunction(_Other.mp_pFunction)
+		, mp_Line(_Other.mp_Line)
+		, mp_TypeHash(_Other.mp_TypeHash)
 	{
 		fp_Copy(_Other);
 	}
@@ -152,17 +152,17 @@ namespace NMib::NException
 #if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
-			m_pCallstack = fg_Construct();
-			m_pCallstack->f_Capture();
+			mp_pCallstack = fg_Construct();
+			mp_pCallstack->f_Capture();
 		}
 #endif
 		if (NStr::fg_StrLen(_pError) > 127)
 		{
-			m_pErrorAlloc = fg_Construct(_pError);
-			m_ErrorNoAlloc[0] = 0;
+			mp_pErrorAlloc = fg_Construct(_pError);
+			mp_ErrorNoAlloc[0] = 0;
 		}
 		else
-			NStr::fg_StrCopy(m_ErrorNoAlloc, _pError, 128);
+			NStr::fg_StrCopy(mp_ErrorNoAlloc, _pError, 128);
 #ifdef DMibExceptionTraceEnable
 		f_TraceException(_bTrace);
 #endif
@@ -173,37 +173,37 @@ namespace NMib::NException
 #if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
-			m_pCallstackNonTracked = fg_Construct();
-			m_pCallstackNonTracked->f_Capture();
+			mp_pCallstackNonTracked = fg_Construct();
+			mp_pCallstackNonTracked->f_Capture();
 		}
 #endif
 		if (NStr::fg_StrLen(_pError) > 127)
 		{
-			m_pErrorAllocNonTracked = fg_Construct(_pError);
-			m_ErrorNoAlloc[0] = 0;
+			mp_pErrorAllocNonTracked = fg_Construct(_pError);
+			mp_ErrorNoAlloc[0] = 0;
 		}
 		else
-			NStr::fg_StrCopy(m_ErrorNoAlloc, _pError, 128);
+			NStr::fg_StrCopy(mp_ErrorNoAlloc, _pError, 128);
 #ifdef DMibExceptionTraceEnable
 		f_TraceException(_bTrace);
 #endif
 	}
 
 	CExceptionBase::CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
-		: m_Magic(mcp_Magic)
-		, m_pClass(_pClass ? _pClass : "CExceptionBase")
-		, m_pFile(_pFile ? _pFile : "Unknown")
-		, m_pFunction(_pFunction ? _pFunction : "Unknown")
-		, m_Line(_Line)
-		, m_pErrorAlloc(fg_Construct(_Error))
-		, m_TypeHash(_TypeHash)
+		: mp_Magic(mcp_Magic)
+		, mp_pClass(_pClass ? _pClass : "CExceptionBase")
+		, mp_pFile(_pFile ? _pFile : "Unknown")
+		, mp_pFunction(_pFunction ? _pFunction : "Unknown")
+		, mp_Line(_Line)
+		, mp_pErrorAlloc(fg_Construct(_Error))
+		, mp_TypeHash(_TypeHash)
 	{
-		m_ErrorNoAlloc[0] = 0;
+		mp_ErrorNoAlloc[0] = 0;
 #if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
-			m_pCallstack = fg_Construct();
-			m_pCallstack->f_Capture();
+			mp_pCallstack = fg_Construct();
+			mp_pCallstack->f_Capture();
 		}
 #endif
 #ifdef DMibExceptionTraceEnable
@@ -222,20 +222,20 @@ namespace NMib::NException
 			, bool _bStackTrace
 			, uint32 _TypeHash
 		)
-		: m_Magic(mcp_Magic)
-		, m_pClass(_pClass ? _pClass : "CExceptionBase")
-		, m_pFile(_pFile ? _pFile : "Unknown")
-		, m_pFunction(_pFunction ? _pFunction : "Unknown")
-		, m_Line(_Line)
-		, m_pErrorAllocNonTracked(fg_Construct(_Error))
-		, m_TypeHash(_TypeHash)
+		: mp_Magic(mcp_Magic)
+		, mp_pClass(_pClass ? _pClass : "CExceptionBase")
+		, mp_pFile(_pFile ? _pFile : "Unknown")
+		, mp_pFunction(_pFunction ? _pFunction : "Unknown")
+		, mp_Line(_Line)
+		, mp_pErrorAllocNonTracked(fg_Construct(_Error))
+		, mp_TypeHash(_TypeHash)
 	{
-		m_ErrorNoAlloc[0] = 0;
+		mp_ErrorNoAlloc[0] = 0;
 #if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
-			m_pCallstackNonTracked = fg_Construct();
-			m_pCallstackNonTracked->f_Capture();
+			mp_pCallstackNonTracked = fg_Construct();
+			mp_pCallstackNonTracked->f_Capture();
 		}
 #endif
 #ifdef DMibExceptionTraceEnable
@@ -371,9 +371,9 @@ namespace NMib::NException
 
 	void CCallstack::f_Trace(umint _Indent) const
 	{
-		for (umint i = 0; i < m_CallstackLen; ++i)
+		for (umint iCallstack = 0; iCallstack < m_CallstackLen; ++iCallstack)
 		{
-			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
+			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[iCallstack]);
 			if (pInfo)
 			{
 				NStr::CStrNonTracked FunctionName = fs_ShortenFunctionName(pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "");
@@ -405,9 +405,9 @@ namespace NMib::NException
 	NStr::CStr CCallstack::f_GetString(umint _Indent) const
 	{
 		NStr::CStr Output;
-		for (umint i = 0; i < m_CallstackLen; ++i)
+		for (umint iCallstack = 0; iCallstack < m_CallstackLen; ++iCallstack)
 		{
-			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[i]);
+			CStackTraceInfo *pInfo = NSys::fg_Debug_AquireStackTraceInfo(m_Callstack[iCallstack]);
 			if (pInfo)
 			{
 				NStr::CStrNonTracked FunctionName = fs_ShortenFunctionName(pInfo->m_pFunctionName ? pInfo->m_pFunctionName : "");
@@ -433,38 +433,38 @@ namespace NMib::NException
 		{
 			NSys::fg_DebugOutput
 				(
-					(NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}: {}" DMibNewLine) << m_pFile << m_Line << m_pClass << f_GetErrorCharPointer()).f_GetStr().f_GetStr()
+					(NStr::CStrNonTracked::CFormat(DMibPFileLineFormat " {}: {}" DMibNewLine) << mp_pFile << mp_Line << mp_pClass << f_GetErrorCharPointer()).f_GetStr().f_GetStr()
 				)
 			;
 
-			if (m_pCallstack)
-				m_pCallstack->f_Trace(0);
+			if (mp_pCallstack)
+				mp_pCallstack->f_Trace(0);
 		}
 	}
 #endif
 
 	CExceptionBase::CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, ch8 const *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
-		: m_Magic(mcp_Magic)
-		, m_pClass(_pClass ? _pClass : "CExceptionBase")
-		, m_pFile(_pFile ? _pFile : "Unknown")
-		, m_pFunction(_pFunction ? _pFunction : "Unknown")
-		, m_Line(_Line)
-		, m_TypeHash(_TypeHash)
+		: mp_Magic(mcp_Magic)
+		, mp_pClass(_pClass ? _pClass : "CExceptionBase")
+		, mp_pFile(_pFile ? _pFile : "Unknown")
+		, mp_pFunction(_pFunction ? _pFunction : "Unknown")
+		, mp_Line(_Line)
+		, mp_TypeHash(_TypeHash)
 	{
 #if DMibConfig_Exception_SupportStackTraces
 		if (_bStackTrace)
 		{
-			m_pCallstack = fg_Construct();
-			m_pCallstack->f_Capture();
+			mp_pCallstack = fg_Construct();
+			mp_pCallstack->f_Capture();
 		}
 #endif
 		if (NStr::fg_StrLen(_pError) > 127)
 		{
-			m_pErrorAlloc = fg_Construct(_pError);
-			m_ErrorNoAlloc[0] = 0;
+			mp_pErrorAlloc = fg_Construct(_pError);
+			mp_ErrorNoAlloc[0] = 0;
 		}
 		else
-			NStr::fg_StrCopy(m_ErrorNoAlloc, _pError, 128);
+			NStr::fg_StrCopy(mp_ErrorNoAlloc, _pError, 128);
 #ifdef DMibExceptionTraceEnable
 		f_TraceException(_bTrace);
 #endif
@@ -476,17 +476,17 @@ namespace NMib::NException
 
 	bool CExceptionBase::f_IsValid() const
 	{
-		return m_Magic == mcp_Magic;
+		return mp_Magic == mcp_Magic;
 	}
 
 	ch8 const *CExceptionBase::f_GetErrorCharPointer() const
 	{
-		if (m_pErrorAlloc)
-			return *m_pErrorAlloc;
-		else if (m_pErrorAllocNonTracked)
-			return *m_pErrorAllocNonTracked;
+		if (mp_pErrorAlloc)
+			return *mp_pErrorAlloc;
+		else if (mp_pErrorAllocNonTracked)
+			return *mp_pErrorAllocNonTracked;
 		else
-			return m_ErrorNoAlloc;
+			return mp_ErrorNoAlloc;
 	}
 
 	CExceptionBase::operator NException::CExceptionPointer () const
@@ -496,34 +496,34 @@ namespace NMib::NException
 
 	NStr::CStr CExceptionBase::f_GetErrorStr() const
 	{
-		if (m_pErrorAlloc)
-			return *m_pErrorAlloc;
-		else if (m_pErrorAllocNonTracked)
-			return *m_pErrorAllocNonTracked;
+		if (mp_pErrorAlloc)
+			return *mp_pErrorAlloc;
+		else if (mp_pErrorAllocNonTracked)
+			return *mp_pErrorAllocNonTracked;
 		else
-			return NStr::CStr(m_ErrorNoAlloc);
+			return NStr::CStr(mp_ErrorNoAlloc);
 	}
 
 	CCallstack const *CExceptionBase::f_GetCallstack() const
 	{
-		if (m_pCallstack)
-			return m_pCallstack.f_Get();
-		else if (m_pCallstackNonTracked)
-			return m_pCallstackNonTracked.f_Get();
+		if (mp_pCallstack)
+			return mp_pCallstack.f_Get();
+		else if (mp_pCallstackNonTracked)
+			return mp_pCallstackNonTracked.f_Get();
 
 		return nullptr;
 	}
 
 	NStr::CStr CExceptionBase::f_GetCallstackStr(umint _Indent) const
 	{
-		if (m_pCallstack)
+		if (mp_pCallstack)
 		{
-			if (auto *pCallstack = m_pCallstack.f_Get())
+			if (auto *pCallstack = mp_pCallstack.f_Get())
 				return pCallstack->f_GetString(_Indent);
 		}
-		else if (m_pCallstackNonTracked)
+		else if (mp_pCallstackNonTracked)
 		{
-			if (auto *pCallstack = m_pCallstackNonTracked.f_Get())
+			if (auto *pCallstack = mp_pCallstackNonTracked.f_Get())
 				return pCallstack->f_GetString(_Indent);
 		}
 		return "";
@@ -531,32 +531,32 @@ namespace NMib::NException
 
 	NStr::CStrNonTracked CExceptionBase::f_GetErrorStrNonTracked() const
 	{
-		if (m_pErrorAlloc)
-			return *m_pErrorAlloc;
-		else if (m_pErrorAllocNonTracked)
-			return *m_pErrorAllocNonTracked;
+		if (mp_pErrorAlloc)
+			return *mp_pErrorAlloc;
+		else if (mp_pErrorAllocNonTracked)
+			return *mp_pErrorAllocNonTracked;
 		else
-			return NStr::CStrNonTracked(m_ErrorNoAlloc);
+			return NStr::CStrNonTracked(mp_ErrorNoAlloc);
 	}
 
 	ch8 const *CExceptionBase::f_GetClass() const
 	{
-		return m_pClass;
+		return mp_pClass;
 	}
 
 	ch8 const *CExceptionBase::f_GetFile() const
 	{
-		return m_pFile;
+		return mp_pFile;
 	}
 
 	ch8 const *CExceptionBase::f_GetFunction() const
 	{
-		return m_pFunction;
+		return mp_pFunction;
 	}
 
 	int32 CExceptionBase::f_GetLine() const
 	{
-		return m_Line;
+		return mp_Line;
 	}
 
 #ifdef DMibExceptionTraceEnable

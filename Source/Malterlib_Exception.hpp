@@ -33,12 +33,12 @@ namespace NMib::NException
 			, bool _bStackTrace
 			, uint32 _TypeHash
 		)
-		: m_Magic(mcp_Magic)
-		, m_pClass(_pClass ? _pClass : "CExceptionBase")
-		, m_pFile(_pFile ? _pFile : "Unknown")
-		, m_pFunction(_pFunction ? _pFunction : "Unknown")
-		, m_Line(_Line)
-		, m_TypeHash(_TypeHash)
+		: mp_Magic(mcp_Magic)
+		, mp_pClass(_pClass ? _pClass : "CExceptionBase")
+		, mp_pFile(_pFile ? _pFile : "Unknown")
+		, mp_pFunction(_pFunction ? _pFunction : "Unknown")
+		, mp_Line(_Line)
+		, mp_TypeHash(_TypeHash)
 	{
 		if constexpr (NTraits::cIsSame<typename tf_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator> || !NStr::TCStr<tf_CError>::mc_AllocatesMemory)
 			fp_ConstructNonTracked(_Error.f_GetStr(), _bTrace, _bStackTrace);
@@ -48,7 +48,7 @@ namespace NMib::NException
 
 	inline_always_debug uint32 CExceptionBase::f_TypeHash() const
 	{
-		return m_TypeHash;
+		return mp_TypeHash;
 	}
 
 #ifdef DMibRuntimeTypeRegistry
@@ -63,8 +63,8 @@ namespace NMib::NException
 	{
 		NStr::CStrNonTracked NonTracked;
 		_Stream >> NonTracked;
-		m_pErrorAllocNonTracked = fg_Construct(NonTracked);
-		m_ErrorNoAlloc[0] = 0;
+		mp_pErrorAllocNonTracked = fg_Construct(NonTracked);
+		mp_ErrorNoAlloc[0] = 0;
 	}
 #endif
 

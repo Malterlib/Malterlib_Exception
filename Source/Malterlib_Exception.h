@@ -83,7 +83,7 @@ namespace NMib::NException
 		static constexpr uint32 mc_StreamVersion = 0; // See gc_ExceptionDataStreamVersion
 
 		// If this exception could cause errors with memory management, keep it shorter than 127 characters so it fits in
-		// m_ErrorNoAlloc, which needs no memory management.
+		// mp_ErrorNoAlloc, which needs no memory management.
 		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, ch8 const *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::CStr const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::CStrNonTracked const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
@@ -131,18 +131,18 @@ namespace NMib::NException
 #endif
 
 	private:
-		static uint32 const mcp_Magic = 0xE538CB10;
-		uint32 m_Magic;
-		ch8 const *m_pClass;
-		ch8 const *m_pFile;
-		ch8 const *m_pFunction;
-		int32 m_Line;
-		ch8 m_ErrorNoAlloc[128];
-		NStorage::TCUniquePointer<NStr::CStr> m_pErrorAlloc;
-		NStorage::TCUniquePointer<NStr::CStrNonTracked, NMemory::CAllocator_NonTrackedHeap> m_pErrorAllocNonTracked;
-		NStorage::TCUniquePointer<CCallstack> m_pCallstack;
-		NStorage::TCUniquePointer<CCallstack, NMemory::CAllocator_NonTrackedHeap> m_pCallstackNonTracked;
-		uint32 m_TypeHash;
+		static constexpr uint32 mcp_Magic = 0xE538CB10;
+		uint32 mp_Magic;
+		ch8 const *mp_pClass;
+		ch8 const *mp_pFile;
+		ch8 const *mp_pFunction;
+		int32 mp_Line;
+		ch8 mp_ErrorNoAlloc[128];
+		NStorage::TCUniquePointer<NStr::CStr> mp_pErrorAlloc;
+		NStorage::TCUniquePointer<NStr::CStrNonTracked, NMemory::CAllocator_NonTrackedHeap> mp_pErrorAllocNonTracked;
+		NStorage::TCUniquePointer<CCallstack> mp_pCallstack;
+		NStorage::TCUniquePointer<CCallstack, NMemory::CAllocator_NonTrackedHeap> mp_pCallstackNonTracked;
+		uint32 mp_TypeHash;
 
 		void fp_Construct(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
 		void fp_ConstructNonTracked(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
@@ -274,13 +274,13 @@ namespace NMib::NException
 		void f_Feed(tf_CStream &_Stream) const\
 		{\
 			d_CParent::f_Feed(_Stream);\
-			_Stream << m_SpecificData;\
+			_Stream << mp_SpecificData;\
 		}\
 		template <typename tf_CStream>\
 		void f_Consume(tf_CStream &_Stream)\
 		{\
 			d_CParent::f_Consume(_Stream);\
-			_Stream >> m_SpecificData;\
+			_Stream >> mp_SpecificData;\
 		}
 
 #else
@@ -337,7 +337,7 @@ namespace NMib::NException
 	struct d_CClass : public d_CParent\
 	{\
 	private:\
-		d_CSpecificType m_SpecificData;\
+		d_CSpecificType mp_SpecificData;\
 	public:\
 		template <typename tf_CError>\
 		d_CClass\
@@ -353,25 +353,25 @@ namespace NMib::NException
 				, uint32 _TypeHash = ms_TypeHash\
 			)\
 			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
-			, m_SpecificData(_SpecificData)\
+			, mp_SpecificData(_SpecificData)\
 		{\
 			fp_RegisterTypeRegistry();\
 		}\
 		template <typename tf_CError>\
 		d_CClass(const ch8 *_pClass, tf_CError &&_Error, bool _bTrace, d_CSpecificType const &_SpecificData = fg_Default(), bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)\
 			: d_CParent(_pClass ? _pClass : DMibStringize(d_CClass), fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)\
-			, m_SpecificData(_SpecificData)\
+			, mp_SpecificData(_SpecificData)\
 		{\
 			fp_RegisterTypeRegistry();\
 		}\
 		NMib::NException::CExceptionPointer f_ExceptionPointer() const override;\
 		d_CSpecificType const &f_GetSpecific() const\
 		{\
-			return m_SpecificData;\
+			return mp_SpecificData;\
 		}\
 		d_CSpecificType &f_GetSpecific() \
 		{\
-			return m_SpecificData;\
+			return mp_SpecificData;\
 		}\
 		~d_CClass();\
 		DMibImpErrorSpecificClass_Streaming(d_CParent)\

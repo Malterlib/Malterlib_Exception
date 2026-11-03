@@ -35,10 +35,10 @@ namespace NMib::NException
 			)
 		;
 
-		std::exception_ptr ptr;
-		*((void **)&ptr) = pExceptionMemory;
+		std::exception_ptr pException;
+		*((void **)&pException) = pExceptionMemory;
 
-		return ptr;
+		return pException;
 	}
 
 	template <typename ...tfp_CExceptions, typename tf_FOnValid>
