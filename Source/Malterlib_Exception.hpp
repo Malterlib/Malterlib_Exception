@@ -13,6 +13,16 @@ namespace NMib::NConcurrency::NPrivate
 
 namespace NMib::NException
 {
+	inline_always int fg_UncaughtExceptions()
+	{
+		return std::uncaught_exceptions();
+	}
+
+	inline_always CExceptionPointer fg_CurrentException()
+	{
+		return std::current_exception();
+	}
+
 	template <typename tf_CFormatter>
 	// This crashes GCC
 	// auto f_CreateStringFormatter(tf_CFormatter &_Formatter) const -> decltype(NStr::fg_CreateStringFormatter(_Formatter, ""))
@@ -65,6 +75,48 @@ namespace NMib::NException
 		_Stream >> NonTracked;
 		mp_pErrorAllocNonTracked = fg_Construct(NonTracked);
 		mp_ErrorNoAlloc[0] = 0;
+	}
+#endif
+
+	template <typename tf_CException, TCEnableIf<NTraits::cIsBaseOf<NTraits::TCRemoveReference<tf_CException>, CExceptionBase>> *>
+	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
+	{
+		return _Exception.f_ExceptionPointer();
+	}
+
+	template <typename tf_CException, TCEnableIf<!NTraits::cIsBaseOf<NTraits::TCRemoveReference<tf_CException>, CExceptionBase>> *>
+	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
+	{
+		return fg_MakeException(fg_Forward<tf_CException>(_Exception));
+	}
+
+	template <typename tf_CError>
+	CException::CException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+		: CExceptionBase(_pClass ? _pClass : "CException", _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+	{
+		fp_RegisterTypeRegistry();
+	}
+
+	template <typename tf_CError>
+	CException::CException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+		: CExceptionBase(_pClass ? _pClass : "CException", "", 0, "", fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+	{
+		fp_RegisterTypeRegistry();
+	}
+
+#ifdef DMibNeedDebugException
+	template <typename tf_CError>
+	CDebugException::CDebugException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+		: CExceptionBase(_pClass ? _pClass : "CDebugException", _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+	{
+		fp_RegisterTypeRegistry();
+	}
+
+	template <typename tf_CError>
+	CDebugException::CDebugException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash)
+		: CExceptionBase(_pClass ? _pClass : "CDebugException", "", 0, "", fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
+	{
+		fp_RegisterTypeRegistry();
 	}
 #endif
 

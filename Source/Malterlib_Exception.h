@@ -22,15 +22,8 @@ namespace NMib::NException
 
 	struct CDisableExceptionFilterScope;
 
-	inline_always int fg_UncaughtExceptions()
-	{
-		return std::uncaught_exceptions();
-	}
-
-	inline_always CExceptionPointer fg_CurrentException()
-	{
-		return std::current_exception();
-	}
+	inline_always int fg_UncaughtExceptions();
+	inline_always CExceptionPointer fg_CurrentException();
 
 	// Tracing exceptions is not so useful any more so let's leave it disabled. If you need it uncomment this.
 //#ifdef DMibDebug
@@ -153,19 +146,13 @@ namespace NMib::NException
 	concept cIsException = NTraits::cIsBaseOf<NTraits::TCRemoveReference<t_CException>, CExceptionBase>;
 
 	template <typename tf_CException, TCEnableIf<NTraits::cIsBaseOf<NTraits::TCRemoveReference<tf_CException>, CExceptionBase>> * = nullptr>
-	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
-	{
-		return _Exception.f_ExceptionPointer();
-	}
+	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception);
 
 	NStr::CStr fg_ExceptionString(CExceptionPointer const &_pExceptionPointer);
 	NStr::CStr fg_CurrentExceptionString();
 
 	template <typename tf_CException, TCEnableIf<!NTraits::cIsBaseOf<NTraits::TCRemoveReference<tf_CException>, CExceptionBase>> * = nullptr>
-	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception)
-	{
-		return fg_MakeException(fg_Forward<tf_CException>(_Exception));
-	}
+	CExceptionPointer fg_ExceptionPointer(tf_CException &&_Exception);
 
 #ifdef DMibRuntimeTypeRegistry
 #	define DMibException_TypeHash(d_Type) DMibConstantTypeHash(d_Type)
@@ -178,18 +165,9 @@ namespace NMib::NException
 	struct CException : public CExceptionBase
 	{
 		template <typename tf_CError>
-		CException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CException", _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
-		{
-			fp_RegisterTypeRegistry();
-		}
-
+		CException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash);
 		template <typename tf_CError>
-		CException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CException", "", 0, "", fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
-		{
-			fp_RegisterTypeRegistry();
-		}
+		CException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash);
 
 		CExceptionPointer f_ExceptionPointer() const override;
 
@@ -206,18 +184,9 @@ namespace NMib::NException
 	struct CDebugException : public CExceptionBase
 	{
 		template <typename tf_CError>
-		CDebugException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CDebugException", _pFile, _Line, _pFunction, fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
-		{
-			fp_RegisterTypeRegistry();
-		}
-
+		CDebugException(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash);
 		template <typename tf_CError>
-		CDebugException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash)
-			: CExceptionBase(_pClass ? _pClass : "CDebugException", "", 0, "", fg_Forward<tf_CError>(_Error), _bTrace, _bStackTrace, _TypeHash)
-		{
-			fp_RegisterTypeRegistry();
-		}
+		CDebugException(ch8 const *_pClass, tf_CError &&_Error, bool _bTrace, bool _bStackTrace = true, uint32 _TypeHash = ms_TypeHash);
 
 		CExceptionPointer f_ExceptionPointer() const override;
 
