@@ -40,7 +40,7 @@ namespace NMib::NException
 		, mp_Line(_Line)
 		, mp_TypeHash(_TypeHash)
 	{
-		if constexpr (NTraits::cIsSame<typename tf_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator> || !NStr::TCStr<tf_CError>::mc_AllocatesMemory)
+		if constexpr (NTraits::cIsSame<typename tf_CError::CStrTraits::CAllocator, NStr::CStrNonTracked::CAllocator> || !NStr::TCStr<tf_CError>::mc_bAllocatesMemory)
 			fp_ConstructNonTracked(_Error.f_GetStr(), _bTrace, _bStackTrace);
 		else
 			fp_Construct(_Error.f_GetStr(), _bTrace, _bStackTrace);
