@@ -73,8 +73,6 @@ namespace NMib::NException
 
 	struct CExceptionBase
 	{
-		static constexpr uint32 mc_StreamVersion = 0; // See gc_ExceptionDataStreamVersion
-
 		// If this exception could cause errors with memory management, keep it shorter than 127 characters so it fits in
 		// mp_ErrorNoAlloc, which needs no memory management.
 		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, ch8 const *_pError, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
@@ -85,8 +83,9 @@ namespace NMib::NException
 		CExceptionBase(ch8 const *_pClass, ch8 const *_pFile, aint _Line, ch8 const *_pFunction, NStr::TCStr<tf_CError> const &_Error, bool _bTrace, bool _bStackTrace, uint32 _TypeHash);
 
 		CExceptionBase(CExceptionBase const &_Other);
-		CExceptionBase &operator = (CExceptionBase const &_Other);
 		virtual ~CExceptionBase();
+
+		CExceptionBase &operator = (CExceptionBase const &_Other);
 		ch8 const *f_GetErrorCharPointer() const;
 		NStr::CStr f_GetErrorStr() const;
 		NStr::CStrNonTracked f_GetErrorStrNonTracked() const;
@@ -123,8 +122,15 @@ namespace NMib::NException
 		void f_Consume(tf_CStream &_Stream);
 #endif
 
+		static constexpr uint32 mc_StreamVersion = 0; // See gc_ExceptionDataStreamVersion
+
 	private:
+		void fp_Construct(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
+		void fp_ConstructNonTracked(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
+		void fp_Copy(CExceptionBase const &_Other);
+
 		static constexpr uint32 mcp_Magic = 0xE538CB10;
+
 		uint32 mp_Magic;
 		ch8 const *mp_pClass;
 		ch8 const *mp_pFile;
@@ -136,10 +142,6 @@ namespace NMib::NException
 		NStorage::TCUniquePointer<CCallstack> mp_pCallstack;
 		NStorage::TCUniquePointer<CCallstack, NMemory::CAllocator_NonTrackedHeap> mp_pCallstackNonTracked;
 		uint32 mp_TypeHash;
-
-		void fp_Construct(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
-		void fp_ConstructNonTracked(ch8 const *_pError, bool _bTrace, bool _bStackTrace);
-		void fp_Copy(CExceptionBase const &_Other);
 	};
 
 	template <typename t_CException>

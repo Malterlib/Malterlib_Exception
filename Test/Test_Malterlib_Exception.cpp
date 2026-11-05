@@ -16,52 +16,74 @@ namespace NMib::NException
 	template <typename t_CCatch, typename t_CLambda, typename t_CParent>
 	struct TCExceptionalCatch : public t_CParent
 	{
-		t_CLambda m_Lambda;
-		inline_always TCExceptionalCatch(t_CLambda _Lambda, t_CParent _Parent)
-			: t_CParent(_Parent)
-			, m_Lambda(_Lambda)
-		{
-		}
+		inline_always TCExceptionalCatch(t_CLambda _Lambda, t_CParent _Parent);
 
 		template <typename tf_CCatch, typename tf_CLambda>
-		inline_always TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptionalCatch> f_Catch(tf_CLambda _Lambda) const
-		{
-			return TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptionalCatch>(_Lambda, *this);
-		}
+		inline_always TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptionalCatch> f_Catch(tf_CLambda _Lambda) const;
 
-		inline_always void f_Execute() const
-		{
-			try
-			{
-				t_CParent::f_Execute();
-			}
-			catch (t_CCatch const &_Exception)
-			{
-				m_Lambda(_Exception);
-			}
-		}
+		inline_always void f_Execute() const;
+
+		t_CLambda m_Lambda;
 	};
+
+	template <typename t_CCatch, typename t_CLambda, typename t_CParent>
+	TCExceptionalCatch<t_CCatch, t_CLambda, t_CParent>::TCExceptionalCatch(t_CLambda _Lambda, t_CParent _Parent)
+		: t_CParent(_Parent)
+		, m_Lambda(_Lambda)
+	{
+	}
+
+	template <typename t_CCatch, typename t_CLambda, typename t_CParent>
+	template <typename tf_CCatch, typename tf_CLambda>
+	TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptionalCatch<t_CCatch, t_CLambda, t_CParent>> TCExceptionalCatch<t_CCatch, t_CLambda, t_CParent>::f_Catch(tf_CLambda _Lambda) const
+	{
+		return TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptionalCatch>(_Lambda, *this);
+	}
+
+	template <typename t_CCatch, typename t_CLambda, typename t_CParent>
+	void TCExceptionalCatch<t_CCatch, t_CLambda, t_CParent>::f_Execute() const
+	{
+		try
+		{
+			t_CParent::f_Execute();
+		}
+		catch (t_CCatch const &_Exception)
+		{
+			m_Lambda(_Exception);
+		}
+	}
 
 	template <typename t_CLambda>
 	struct TCExceptional
 	{
-		t_CLambda m_Lambda;
-		inline_always TCExceptional(t_CLambda _Lambda)
-			: m_Lambda(_Lambda)
-		{
-		}
+		inline_always TCExceptional(t_CLambda _Lambda);
 
 		template <typename tf_CCatch, typename tf_CLambda>
-		inline_always TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptional> f_Catch(tf_CLambda _Lambda) const
-		{
-			return TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptional>(_Lambda, *this);
-		}
+		inline_always TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptional> f_Catch(tf_CLambda _Lambda) const;
 
-		inline_always void f_Execute() const
-		{
-			m_Lambda();
-		}
+		inline_always void f_Execute() const;
+
+		t_CLambda m_Lambda;
 	};
+
+	template <typename t_CLambda>
+	TCExceptional<t_CLambda>::TCExceptional(t_CLambda _Lambda)
+		: m_Lambda(_Lambda)
+	{
+	}
+
+	template <typename t_CLambda>
+	template <typename tf_CCatch, typename tf_CLambda>
+	TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptional<t_CLambda>> TCExceptional<t_CLambda>::f_Catch(tf_CLambda _Lambda) const
+	{
+		return TCExceptionalCatch<tf_CCatch, tf_CLambda, TCExceptional>(_Lambda, *this);
+	}
+
+	template <typename t_CLambda>
+	void TCExceptional<t_CLambda>::f_Execute() const
+	{
+		m_Lambda();
+	}
 
 	template <typename tf_CLambda>
 	inline_always TCExceptional<tf_CLambda> fg_Try(tf_CLambda const &_Lambda)
@@ -85,230 +107,232 @@ namespace
 
 	struct CExceptions_Tests : public NMib::NTest::CTest
 	{
-		void f_DoTests()
+		void f_DoTests();
+	};
+
+	void CExceptions_Tests::f_DoTests()
+	{
+		// << CTestGroup("Unfinished")
+		DMibTestCategoryFlags(CTestCategory("Exception lambdas"), ETestCategoryFlag_DisableExceptionFilter | ETestCategoryFlag_Tests)
 		{
-			// << CTestGroup("Unfinished")
-			DMibTestCategoryFlags(CTestCategory("Exception lambdas"), ETestCategoryFlag_DisableExceptionFilter | ETestCategoryFlag_Tests)
 			{
+				int volatile bThrowException = false;
+				bool bExceptionCaught = false;
+
+				NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsLambdaTime;
+				NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsTime;
+				NMib::NTime::CPrefCyclesTimeMeasureMin NoExceptionsTime;
+				for (umint iRun = 0; iRun < 10; ++iRun)
 				{
-					int volatile bThrowException = false;
-					bool bExceptionCaught = false;
-
-					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsLambdaTime;
-					NMib::NTime::CPrefCyclesTimeMeasureMin ExceptionsTime;
-					NMib::NTime::CPrefCyclesTimeMeasureMin NoExceptionsTime;
-					for (umint iRun = 0; iRun < 10; ++iRun)
+					ExceptionsLambdaTime.f_Start();
+					for (umint iIteration = 0; iIteration < 10000; ++iIteration)
 					{
-						ExceptionsLambdaTime.f_Start();
-						for (umint iIteration = 0; iIteration < 10000; ++iIteration)
-						{
-							NMib::NException::fg_Try
-								(
-									[&]()
-									{
-										if (bThrowException)
-											throw int(30);
-									}
-								)
-								.f_Catch<int>
-								(
-									[&](int _Exception)
-									{
-										bExceptionCaught = true;
-									}
-								)
-								.f_Catch<float>
-								(
-									[&](float _Exception)
-									{
-										bExceptionCaught = true;
-									}
-								)
-								.f_Execute()
-							;
-						}
-						ExceptionsLambdaTime.f_Stop();
+						NMib::NException::fg_Try
+							(
+								[&]()
+								{
+									if (bThrowException)
+										throw int(30);
+								}
+							)
+							.f_Catch<int>
+							(
+								[&](int _Exception)
+								{
+									bExceptionCaught = true;
+								}
+							)
+							.f_Catch<float>
+							(
+								[&](float _Exception)
+								{
+									bExceptionCaught = true;
+								}
+							)
+							.f_Execute()
+						;
 					}
-					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false));
+					ExceptionsLambdaTime.f_Stop();
+				}
+				DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false));
 
-					for (umint iRun = 0; iRun < 10; ++iRun)
+				for (umint iRun = 0; iRun < 10; ++iRun)
+				{
+					ExceptionsTime.f_Start();
+					for (umint iIteration = 0; iIteration < 10000; ++iIteration)
 					{
-						ExceptionsTime.f_Start();
-						for (umint iIteration = 0; iIteration < 10000; ++iIteration)
-						{
-							try
-							{
-								if (bThrowException)
-									throw int(30);
-							}
-							catch (int)
-							{
-								bExceptionCaught = true;
-							}
-							catch (float)
-							{
-								bExceptionCaught = true;
-							}
-						}
-						ExceptionsTime.f_Stop();
-					}
-
-					for (umint iRun = 0; iRun < 10; ++iRun)
-					{
-						NoExceptionsTime.f_Start();
-						for (umint iIteration = 0; iIteration < 10000; ++iIteration)
+						try
 						{
 							if (bThrowException)
 								throw int(30);
 						}
-						NoExceptionsTime.f_Stop();
-					}
-
-					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false) && DMibExpr(2));
-					/*
-					ExceptionsLambdaTime /= 10000;
-					ExceptionsTime /= 10000;
-					NoExceptionsTime /= 10000;
-					DMibTest(DMibExpr(ExceptionsLambdaTime) / DMibExpr(ExceptionsTime) >= DMibExpr(1.0));
-					DMibTest(DMibExpr(ExceptionsTime) / DMibExpr(NoExceptionsTime) >= DMibExpr(1.0));*/
-				}
-				{
-					bool bExceptionCaught = false;
-					NMib::NException::fg_Try
-						(
-							[&]()
-							{
-								throw int(30);
-							}
-						)
-						.f_Catch<int>
-						(
-							[&](int _Exception)
-							{
-								bExceptionCaught = true;
-								// DMibTrace("{}\r\n", _Exception);
-								// throw;
-							}
-						)
-						.f_Execute()
-					;
-
-					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true));
-				}
-				{
-					bool bExceptionCaught = false;
-					NMib::NException::fg_Try
-						(
-							[&]()
-							{
-								throw float(30);
-							}
-						)
-						.f_Catch<int>
-						(
-							[&](int _Exception)
-							{
-								bExceptionCaught = true;
-								// DMibTrace("{}\r\n", _Exception);
-								// throw;
-							}
-						)
-						.f_Catch<float>
-						(
-							[&](float _Exception)
-							{
-								bExceptionCaught = true;
-								// DMibTrace("{}\r\n", _Exception);
-								// throw;
-							}
-						)
-						.f_Execute()
-					;
-
-					DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true) && DMibExpr(2));
-				}
-				{
-					int ExceptionCaught = false;
-					NMib::NException::fg_Try
-						(
-							[&]()
-							{
-								throw int(30);
-							}
-						)
-						.f_Catch<int>
-						(
-							[&](int _Exception)
-							{
-								++ExceptionCaught;
-								throw;
-							}
-						)
-						.f_Catch<int>
-						(
-							[&](int _Exception)
-							{
-								++ExceptionCaught;
-								//throw;
-							}
-						)
-						.f_Execute()
-					;
-
-					DMibTest(DMibExpr(ExceptionCaught) == DMibExpr(2));
-				}
-			};
-			DMibTestSuite("General")
-			{
-				TCAsyncResult<int> Result;
-				try
-				{
-					DMibError("Test");
-					Result.f_SetResult(1);
-				}
-				catch (NMib::NException::CException const &)
-				{
-					Result.f_SetCurrentException();
-				}
-
-				DMibTest(!DMibExpr(Result));
-
-				DMibExpectException(Result.f_Get(), DMibErrorInstance("Test"));
-
-				TCAsyncResult<int> NewResult = Result;
-
-				DMibExpectException(NewResult.f_Get(), DMibErrorInstance("Test"));
-			};
-			DMibTestSuite(CTestCategory("GetExceptionString") << CTestGroup("Performance"))
-			{
-				CTestPerformance PerfTotal(0.75, false);
-				umint nIterations = 11;
-#ifdef DMibDebug
-				umint nTests = 10000;
-#else
-				umint nTests = 100000;
-#endif
-				CAsyncResult Result;
-				Result.f_SetException(fg_MakeException(DMibErrorInstance("Test error")));
-				{
-					CTestPerformanceMeasure Measure("Malterlib");
-					for (umint iIteration = 0; iIteration < nIterations; ++iIteration)
-					{
-						Measure.f_Start();
-						[&]() inline_never
+						catch (int)
 						{
-							for (umint iTest = 0; iTest < nTests; ++iTest)
-								Result.f_GetExceptionStr();
+							bExceptionCaught = true;
 						}
-						();
-						Measure.f_Stop(nTests);
+						catch (float)
+						{
+							bExceptionCaught = true;
+						}
 					}
-					PerfTotal.f_Add(Measure);
+					ExceptionsTime.f_Stop();
 				}
-				DMibExpectTrue(PerfTotal);
-			};
-		}
-	};
+
+				for (umint iRun = 0; iRun < 10; ++iRun)
+				{
+					NoExceptionsTime.f_Start();
+					for (umint iIteration = 0; iIteration < 10000; ++iIteration)
+					{
+						if (bThrowException)
+							throw int(30);
+					}
+					NoExceptionsTime.f_Stop();
+				}
+
+				DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(false) && DMibExpr(2));
+				/*
+				ExceptionsLambdaTime /= 10000;
+				ExceptionsTime /= 10000;
+				NoExceptionsTime /= 10000;
+				DMibTest(DMibExpr(ExceptionsLambdaTime) / DMibExpr(ExceptionsTime) >= DMibExpr(1.0));
+				DMibTest(DMibExpr(ExceptionsTime) / DMibExpr(NoExceptionsTime) >= DMibExpr(1.0));*/
+			}
+			{
+				bool bExceptionCaught = false;
+				NMib::NException::fg_Try
+					(
+						[&]()
+						{
+							throw int(30);
+						}
+					)
+					.f_Catch<int>
+					(
+						[&](int _Exception)
+						{
+							bExceptionCaught = true;
+							// DMibTrace("{}\r\n", _Exception);
+							// throw;
+						}
+					)
+					.f_Execute()
+				;
+
+				DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true));
+			}
+			{
+				bool bExceptionCaught = false;
+				NMib::NException::fg_Try
+					(
+						[&]()
+						{
+							throw float(30);
+						}
+					)
+					.f_Catch<int>
+					(
+						[&](int _Exception)
+						{
+							bExceptionCaught = true;
+							// DMibTrace("{}\r\n", _Exception);
+							// throw;
+						}
+					)
+					.f_Catch<float>
+					(
+						[&](float _Exception)
+						{
+							bExceptionCaught = true;
+							// DMibTrace("{}\r\n", _Exception);
+							// throw;
+						}
+					)
+					.f_Execute()
+				;
+
+				DMibTest(DMibExpr(bExceptionCaught) == DMibExpr(true) && DMibExpr(2));
+			}
+			{
+				int ExceptionCaught = false;
+				NMib::NException::fg_Try
+					(
+						[&]()
+						{
+							throw int(30);
+						}
+					)
+					.f_Catch<int>
+					(
+						[&](int _Exception)
+						{
+							++ExceptionCaught;
+							throw;
+						}
+					)
+					.f_Catch<int>
+					(
+						[&](int _Exception)
+						{
+							++ExceptionCaught;
+							//throw;
+						}
+					)
+					.f_Execute()
+				;
+
+				DMibTest(DMibExpr(ExceptionCaught) == DMibExpr(2));
+			}
+		};
+		DMibTestSuite("General")
+		{
+			TCAsyncResult<int> Result;
+			try
+			{
+				DMibError("Test");
+				Result.f_SetResult(1);
+			}
+			catch (NMib::NException::CException const &)
+			{
+				Result.f_SetCurrentException();
+			}
+
+			DMibTest(!DMibExpr(Result));
+
+			DMibExpectException(Result.f_Get(), DMibErrorInstance("Test"));
+
+			TCAsyncResult<int> NewResult = Result;
+
+			DMibExpectException(NewResult.f_Get(), DMibErrorInstance("Test"));
+		};
+		DMibTestSuite(CTestCategory("GetExceptionString") << CTestGroup("Performance"))
+		{
+			CTestPerformance PerfTotal(0.75, false);
+			umint nIterations = 11;
+#ifdef DMibDebug
+			umint nTests = 10000;
+#else
+			umint nTests = 100000;
+#endif
+			CAsyncResult Result;
+			Result.f_SetException(fg_MakeException(DMibErrorInstance("Test error")));
+			{
+				CTestPerformanceMeasure Measure("Malterlib");
+				for (umint iIteration = 0; iIteration < nIterations; ++iIteration)
+				{
+					Measure.f_Start();
+					[&]() inline_never
+					{
+						for (umint iTest = 0; iTest < nTests; ++iTest)
+							Result.f_GetExceptionStr();
+					}
+					();
+					Measure.f_Stop(nTests);
+				}
+				PerfTotal.f_Add(Measure);
+			}
+			DMibExpectTrue(PerfTotal);
+		};
+	}
 
 	DMibTestRegister(CExceptions_Tests, Malterlib::Exception);
 }

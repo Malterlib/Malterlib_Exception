@@ -148,8 +148,6 @@ namespace NMib::NException
 		{
 		}
 
-		static constexpr uint32 mc_StreamVersion = 1; // 1: m_pWrapped with its own stream version
-
 		// From version 1 the reader has exception stream versions, so the wrapped exception streams with its own version too
 		template <typename tf_CStream>
 		void f_Stream(tf_CStream &_Stream)
@@ -162,6 +160,8 @@ namespace NMib::NException
 				m_pWrapped = NConcurrency::NPrivate::fg_ConsumeException(_Stream, bVersioned);
 		}
 
+		static constexpr uint32 mc_StreamVersion = 1; // 1: m_pWrapped with its own stream version
+
 		CExceptionPointer m_pWrapped;
 	};
 
@@ -173,13 +173,21 @@ namespace NMib::NException
 	struct CExceptionExceptionVector;
 	struct CExceptionExceptionVectorData
 	{
+		struct CErrorCollector
+		{
+			void f_AddError(CExceptionPointer &&_pException);
+			CExceptionPointer f_GetException() &&;
+			bool f_HasError() const;
+
+		private:
+			NContainer::TCVector<CExceptionPointer> mp_Exceptions;
+		};
+
 		CExceptionExceptionVectorData() = default;
 		CExceptionExceptionVectorData(NContainer::TCVector<CExceptionPointer> &&_Exceptions)
 			: m_Exceptions(fg_Move(_Exceptions))
 		{
 		}
-
-		static constexpr uint32 mc_StreamVersion = 1; // 1: m_Exceptions with their own stream versions
 
 		// From version 1 the reader has exception stream versions, so each exception streams with its own version too
 		template <typename tf_CStream>
@@ -205,17 +213,9 @@ namespace NMib::NException
 			}
 		}
 
+		static constexpr uint32 mc_StreamVersion = 1; // 1: m_Exceptions with their own stream versions
+
 		NContainer::TCVector<CExceptionPointer> m_Exceptions;
-
-		struct CErrorCollector
-		{
-			void f_AddError(CExceptionPointer &&_pException);
-			CExceptionPointer f_GetException() &&;
-			bool f_HasError() const;
-
-		private:
-			NContainer::TCVector<CExceptionPointer> mp_Exceptions;
-		};
 	};
 
 	DMibImpErrorSpecificClassDefine(CExceptionExceptionVector, CException, CExceptionExceptionVectorData);
